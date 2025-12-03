@@ -1,151 +1,357 @@
-// Shared JavaScript functionality for Sri Lanka Flood Relief Coordinator
+// Main Application Controller
+class FloodReliefApp {
+    constructor() {
+        this.currentLanguage = 'en';
+        this.pendingReports = [];
+        this.approvedReports = [];
+        this.init();
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Language selector functionality
-    const languageSelect = document.getElementById('languageSelect');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', function() {
-            // In a real implementation, this would trigger UI translation
-            console.log('Language changed to:', this.value);
-            // Save preference to localStorage
-            localStorage.setItem('preferredLanguage', this.value);
-        });
+    init() {
+        // Initialize components
+        this.setupEventListeners();
+        this.loadSampleData();
+        this.updateLanguage();
 
-        // Load saved language preference
-        const savedLanguage = localStorage.getItem('preferredLanguage');
-        if (savedLanguage) {
-            languageSelect.value = savedLanguage;
+        // Load pending reports for admin
+        if (window.authManager && window.authManager.isAdmin()) {
+            this.loadPendingReports();
         }
     }
 
-    // Bottom navigation active state
-    const currentPage = window.location.pathname.split('/').pop();
-    const navItems = document.querySelectorAll('.nav-item');
-
-    navItems.forEach(item => {
-        const href = item.getAttribute('href');
-        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-            item.classList.add('active');
-        }
-    });
-
-    // Dark mode toggle functionality
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            // Save preference to localStorage
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    setupEventListeners() {
+        // Language selector
+        const langButtons = document.querySelectorAll('.lang-btn');
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.changeLanguage(e.target.id.replace('lang-', ''));
+            });
         });
 
-        // Load saved dark mode preference
-        const darkModePreference = localStorage.getItem('darkMode');
-        if (darkModePreference === 'enabled') {
-            document.body.classList.add('dark-mode');
+        // FAB button
+        const fab = document.getElementById('fab');
+        if (fab) {
+            fab.addEventListener('click', () => this.openPlaceModal());
+        }
+
+        // Modal close button
+        const closeModal = document.querySelector('.modal .close');
+        if (closeModal) {
+            closeModal.addEventListener('click', () => this.closePlaceModal());
+        }
+
+        // Close modal when clicking outside
+        const modal = document.getElementById('place-modal');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closePlaceModal();
+                }
+            });
+        }
+
+        // Place form submission
+        const placeForm = document.getElementById('place-form');
+        if (placeForm) {
+            placeForm.addEventListener('submit', (e) => this.handleSubmitPlace(e));
+        }
+
+        // Help form submission
+        const helpForm = document.getElementById('help-form');
+        if (helpForm) {
+            helpForm.addEventListener('submit', (e) => this.handleHelpRequest(e));
+        }
+
+        // Navigation buttons
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchTab(e.target.closest('.nav-btn').dataset.tab);
+            });
+        });
+    }
+
+    changeLanguage(lang) {
+        this.currentLanguage = lang;
+
+        // Update active button
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById(`lang-${lang}`).classList.add('active');
+
+        // Update UI text
+        this.updateLanguage();
+    }
+
+    updateLanguage() {
+        // In a real app, this would load translated strings
+        const translations = {
+            en: {
+                'modal-title': 'Add Flood Report',
+                'place-name': 'Place Name',
+                'place-type': 'Type',
+                'place-description': 'Description',
+                'place-severity': 'Severity Level',
+                'submit-btn': 'Submit for Approval'
+            },
+            si: {
+                'modal-title': 'හෙරී වාර්තාව එක් කරන්න',
+                'place-name': 'ස්ථානයේ නම',
+                'place-type': 'වර්ගය',
+                'place-description': 'විස්තරය',
+                'place-severity': 'ප්‍රමාද මට්ටම',
+                'submit-btn': 'අනුමත කිරීම සඳහා යොමු කරන්න'
+            },
+            ta: {
+                'modal-title': 'வெள்ள அறிக்கையைச் சேர்க்கவும்',
+                'place-name': 'இடத்தின் பெயர்',
+                'place-type': 'வகை',
+                'place-description': 'விளக்கம்',
+                'place-severity': 'தீவிரத்தன்மை நிலை',
+                'submit-btn': 'அங்கீகாரத்திற்காக சமர்ப்பிக்கவும்'
+            }
+        };
+
+        const texts = translations[this.currentLanguage];
+        for (const [key, value] of Object.entries(texts)) {
+            const element = document.getElementById(key);
+            if (element) {
+                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT') {
+                    // For form elements, update placeholder or option text
+                    if (element.placeholder) {
+                        element.placeholder = value;
+                    }
+                } else {
+                    element.textContent = value;
+                }
+            }
         }
     }
+
+    openPlaceModal() {
+        const modal = document.getElementById('place-modal');
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    closePlaceModal() {
+        const modal = document.getElementById('place-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+
+        // Reset form
+        const placeForm = document.getElementById('place-form');
+        if (placeForm) {
+            placeForm.reset();
+        }
+    }
+
+    handleSubmitPlace(e) {
+        e.preventDefault();
+
+        // Get form data
+        const placeName = document.getElementById('place-name').value;
+        const placeType = document.getElementById('place-type').value;
+        const placeDescription = document.getElementById('place-description').value;
+        const placeSeverity = document.getElementById('place-severity').value;
+
+        // Create report object
+        const report = {
+            id: Date.now(),
+            name: placeName,
+            type: placeType,
+            description: placeDescription,
+            severity: placeSeverity,
+            status: 'pending',
+            submittedBy: window.authManager ? window.authManager.getCurrentUser().username : 'Anonymous',
+            timestamp: new Date().toISOString()
+        };
+
+        // Save to pending reports
+        this.pendingReports.push(report);
+        this.saveReports();
+
+        // Close modal
+        this.closePlaceModal();
+
+        // Show confirmation
+        alert('Report submitted successfully! Waiting for admin approval.');
+
+        // If admin, reload pending reports
+        if (window.authManager && window.authManager.isAdmin()) {
+            this.loadPendingReports();
+        }
+    }
+
+    loadPendingReports() {
+        // In a real app, this would fetch from a server
+        const container = document.getElementById('pending-reports');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        // Filter pending reports
+        const pending = this.pendingReports.filter(report => report.status === 'pending');
+
+        if (pending.length === 0) {
+            container.innerHTML = '<p>No pending reports</p>';
+            return;
+        }
+
+        pending.forEach(report => {
+            const reportCard = this.createReportCard(report);
+            container.appendChild(reportCard);
+        });
+    }
+
+    createReportCard(report) {
+        const card = document.createElement('div');
+        card.className = `report-card ${report.type}`;
+        card.innerHTML = `
+            <div class="report-header">
+                <div class="report-title">${report.name}</div>
+                <div class="report-type">${report.type}</div>
+            </div>
+            <div class="report-description">${report.description}</div>
+            <div class="report-severity">Severity: ${report.severity}</div>
+            <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
+            <div class="report-actions">
+                <button class="btn-approve" onclick="approveReport(${report.id})">Approve</button>
+                <button class="btn-reject" onclick="rejectReport(${report.id})">Reject</button>
+            </div>
+        `;
+        return card;
+    }
+
+    approveReport(reportId) {
+        const report = this.pendingReports.find(r => r.id == reportId);
+        if (report) {
+            report.status = 'approved';
+            this.approvedReports.push(report);
+            this.saveReports();
+            this.loadPendingReports();
+
+            // Add to map
+            if (window.mapController) {
+                window.mapController.addApprovedPlace(report);
+            }
+
+            alert('Report approved and added to map!');
+        }
+    }
+
+    rejectReport(reportId) {
+        const reportIndex = this.pendingReports.findIndex(r => r.id == reportId);
+        if (reportIndex !== -1) {
+            this.pendingReports.splice(reportIndex, 1);
+            this.saveReports();
+            this.loadPendingReports();
+            alert('Report rejected!');
+        }
+    }
+
+    saveReports() {
+        localStorage.setItem('pendingReports', JSON.stringify(this.pendingReports));
+        localStorage.setItem('approvedReports', JSON.stringify(this.approvedReports));
+    }
+
+    loadSampleData() {
+        // Load from localStorage or initialize with sample data
+        const savedPending = localStorage.getItem('pendingReports');
+        const savedApproved = localStorage.getItem('approvedReports');
+
+        if (savedPending) {
+            this.pendingReports = JSON.parse(savedPending);
+        } else {
+            // Sample pending reports
+            this.pendingReports = [
+                {
+                    id: 1,
+                    name: "Colombo Main Street",
+                    type: "flood",
+                    description: "Severe flooding after heavy rains",
+                    severity: "high",
+                    status: "pending",
+                    submittedBy: "user1",
+                    timestamp: "2023-06-15T10:30:00Z"
+                },
+                {
+                    id: 2,
+                    name: "Kandy Road Block",
+                    type: "road-block",
+                    description: "Landslide blocking the road",
+                    severity: "medium",
+                    status: "pending",
+                    submittedBy: "user2",
+                    timestamp: "2023-06-15T11:45:00Z"
+                }
+            ];
+        }
+
+        if (savedApproved) {
+            this.approvedReports = JSON.parse(savedApproved);
+        } else {
+            // Sample approved reports
+            this.approvedReports = [
+                {
+                    id: 3,
+                    name: "Galle Safe Zone",
+                    type: "safe-zone",
+                    description: "Community center available for shelter",
+                    severity: "low",
+                    status: "approved",
+                    submittedBy: "admin",
+                    timestamp: "2023-06-14T09:15:00Z"
+                }
+            ];
+        }
+    }
+
+    switchTab(tabName) {
+        // Update active nav button
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
+
+        // In a real app, this would switch views
+        console.log(`Switching to tab: ${tabName}`);
+    }
+
+    handleHelpRequest(e) {
+        e.preventDefault();
+
+        // Get form data
+        const name = document.getElementById('help-name').value;
+        const phone = document.getElementById('help-phone').value;
+        const location = document.getElementById('help-location').value;
+        const type = document.getElementById('help-type').value;
+        const description = document.getElementById('help-description').value;
+
+        // In a real app, this would be sent to a server
+        console.log('Help request submitted:', { name, phone, location, type, description });
+
+        // Show confirmation
+        alert('Help request submitted successfully! Emergency services will contact you soon.');
+
+        // Reset form
+        e.target.reset();
+    }
+}
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.floodApp = new FloodReliefApp();
+
+    // Make approve/reject functions globally accessible
+    window.approveReport = (id) => {
+        window.floodApp.approveReport(id);
+    };
+
+    window.rejectReport = (id) => {
+        window.floodApp.rejectReport(id);
+    };
 });
-
-// Utility function to show messages
-function showMessage(elementId, message, isSuccess = true) {
-    const messageElement = document.getElementById(elementId);
-    if (messageElement) {
-        messageElement.textContent = message;
-        messageElement.className = isSuccess ? 'form-message success' : 'form-message error';
-    }
-}
-
-// Utility function to format date for alerts
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-// Trilingual UI text dictionary
-const translations = {
-    en: {
-        mapTitle: "Live Flood Map",
-        alertsTitle: "Official Alerts",
-        helpTitle: "Request Help",
-        sosButton: "SOS",
-        shelters: "Shelters",
-        floodReports: "Flood Reports",
-        supplyPoints: "Supply Points",
-        all: "All",
-        name: "Full Name",
-        phone: "Phone Number",
-        location: "Current Location",
-        useLocation: "Use My Current Location",
-        needs: "Select Your Needs",
-        medicine: "Medicine",
-        food: "Food/Water",
-        rescue: "Boat Rescue",
-        baby: "Baby Supplies",
-        details: "Additional Details",
-        submit: "Submit Request",
-        loading: "Loading...",
-        locationSuccess: "Location captured successfully!",
-        locationError: "Unable to get your location. Please try again.",
-        submitSuccess: "Help request submitted successfully!",
-        submitError: "Error submitting request. Please try again."
-    },
-    si: {
-        mapTitle: "සජීවී වැටීම් සිතියම",
-        alertsTitle: "රජයේ ඇඟවීම්",
-        helpTitle: "උදව් ඉල්ලන්න",
-        sosButton: "ආධුනික උදව්",
-        shelters: "අපදිස්ථාන",
-        floodReports: "වැටීම් වාර්තා",
-        supplyPoints: "විතරණ ලක්ෂ්‍ය",
-        all: "සියල්ල",
-        name: "සම්පූර්ණ නම",
-        phone: "දුරකථන අංකය",
-        location: "වත්මන් පෙළ",
-        useLocation: "මගේ දැන් පෙළ භාවිතා කරන්න",
-        needs: "ඔබගේ අවශ්‍යතා තෝරන්න",
-        medicine: "බෙහෙත්",
-        food: "ආහාර/ජල",
-        rescue: "බෝට් මිදීම",
-        baby: "ළදරුවෝ සඳහා උපාංග",
-        details: "අමතර විස්තර",
-        submit: "ඉල්ලීම යොමු කරන්න",
-        loading: "පූරණය වෙමින්...",
-        locationSuccess: "ස්ථානය සාර්ථකව ලබා ගනු ලැබීය!",
-        locationError: "ඔබගේ ස්ථානය ලබා ගැනීමට නොහැකි විය. යලි උත්සාහ කරන්න.",
-        submitSuccess: "උදව් ඉල්ලීම සාර්ථකව යොමු කරන ලදී!",
-        submitError: "ඉල්ලීම යොමු කිරීමේදී දෝෂයක් ඇති විය. යලි උත්සාහ කරන්න."
-    },
-    ta: {
-        mapTitle: "நேரடி வெள்ள வரைபடம்",
-        alertsTitle: "அதிகாரபூர்வ எச்சரிக்கைகள்",
-        helpTitle: "உதவி கோருதல்",
-        sosButton: "அவசர உதவி",
-        shelters: "புகலிடங்கள்",
-        floodReports: "வெள்ள அறிக்கைகள்",
-        supplyPoints: "சரக்கு புள்ளிகள்",
-        all: "அனைத்தும்",
-        name: "முழு பெயர்",
-        phone: "தொலைபேசி எண்",
-        location: "தற்போதைய இருப்பிடம்",
-        useLocation: "எனது தற்போதைய இருப்பிடத்தைப் பயன்படுத்தவும்",
-        needs: "உங்கள் தேவைகளைத் தேர்ந்தெடுக்கவும்",
-        medicine: "மருந்து",
-        food: "உணவு/தண்ணீர்",
-        rescue: "படகு மீட்பு",
-        baby: "குழந்தை பொருட்கள்",
-        details: "கூடுதல் விவரங்கள்",
-        submit: "கோரிக்கையை சமர்ப்பிக்கவும்",
-        loading: "ஏற்றுகிறது...",
-        locationSuccess: "இருப்பிடம் வெற்றிகரமாக பிடிக்கப்பட்டது!",
-        locationError: "உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
-        submitSuccess: "உதவி கோரிக்கை வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!",
-        submitError: "கோரிக்கையை சமர்ப்பிப்பதில் பிழை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்."
-    }
-};
-
-// Function to get translated text
-function getText(key) {
-    const lang = localStorage.getItem('preferredLanguage') || 'en';
-    return translations[lang][key] || translations['en'][key];
-}
