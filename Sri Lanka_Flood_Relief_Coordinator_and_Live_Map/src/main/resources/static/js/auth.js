@@ -42,8 +42,12 @@ class AuthManager {
         localStorage.setItem('floodReliefUser', JSON.stringify(this.currentUser));
         this.updateUI();
 
-        // Redirect to main app
-        window.location.href = 'index.html';
+        // Redirect based on role
+        if (role === 'admin') {
+            window.location.href = 'index.html'; // Admins go to the main dashboard
+        } else {
+            window.location.href = 'index.html'; // Members also go to the main dashboard
+        }
         return true;
     }
 

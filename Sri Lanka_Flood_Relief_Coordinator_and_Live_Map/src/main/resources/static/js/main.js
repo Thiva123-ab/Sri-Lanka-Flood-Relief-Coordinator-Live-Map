@@ -317,8 +317,28 @@ class FloodReliefApp {
         });
         document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
 
-        // In a real app, this would switch views
-        console.log(`Switching to tab: ${tabName}`);
+        // Navigate to the appropriate page
+        switch(tabName) {
+            case 'map':
+                if (!window.location.pathname.includes('index.html')) {
+                    window.location.href = 'index.html';
+                }
+                break;
+            case 'reports':
+                // This would show reports on the main page
+                console.log('Showing reports');
+                break;
+            case 'alerts':
+                if (!window.location.pathname.includes('alerts.html')) {
+                    window.location.href = 'alerts.html';
+                }
+                break;
+            case 'profile':
+                if (!window.location.pathname.includes('help.html')) {
+                    window.location.href = 'help.html';
+                }
+                break;
+        }
     }
 
     handleHelpRequest(e) {
