@@ -334,8 +334,15 @@ class FloodReliefApp {
                 }
                 break;
             case 'profile':
-                if (!window.location.pathname.includes('help.html')) {
-                    window.location.href = 'help.html';
+                // Check if user is admin
+                if (window.authManager && window.authManager.isAdmin()) {
+                    if (!window.location.pathname.includes('admin.html')) {
+                        window.location.href = 'admin.html';
+                    }
+                } else {
+                    if (!window.location.pathname.includes('help.html')) {
+                        window.location.href = 'help.html';
+                    }
                 }
                 break;
         }

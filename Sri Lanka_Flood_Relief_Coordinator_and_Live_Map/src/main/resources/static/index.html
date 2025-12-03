@@ -3,65 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sri Lanka Flood Relief Coordinator</title>
+    <title>Flood Relief Sri Lanka</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/map.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+<!-- Language Selector -->
+<div class="language-selector">
+    <button id="lang-en" class="lang-btn active">EN</button>
+    <button id="lang-si" class="lang-btn">සිං</button>
+    <button id="lang-ta" class="lang-btn">த</button>
+</div>
+
 <!-- Header -->
-<header>
-    <div class="logo-container">
-        <div class="logo-text">
-            <span class="logo-icon">🌊</span>
-            <span class="logo-name">FloodRelief</span>
-        </div>
-        <h1>Flood Relief SL</h1>
+<header class="app-header">
+    <div class="logo">
+        <h1>🌊 Flood Relief SL</h1>
     </div>
-    <div class="language-selector">
-        <select id="languageSelect">
-            <option value="en">English</option>
-            <option value="si">සිංහල</option>
-            <option value="ta">தமிழ்</option>
-        </select>
+    <div class="user-info">
+        <span id="user-role">Member</span>
+        <button id="logout-btn" class="btn btn-secondary">Logout</button>
     </div>
 </header>
 
-<!-- Filter Controls -->
-<div class="filter-controls">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="shelters">Shelters</button>
-    <button class="filter-btn" data-filter="floods">Flood Reports</button>
-    <button class="filter-btn" data-filter="supplies">Supply Points</button>
-</div>
+<!-- Main Content -->
+<main class="main-container">
+    <!-- Map Container -->
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
 
-<!-- Map Container -->
-<main id="map"></main>
+    <!-- Floating Action Button -->
+    <button id="fab" class="fab">
+        <i class="fas fa-plus"></i>
+    </button>
 
-<!-- Floating Action Button -->
-<button class="fab" id="requestHelpBtn">
-    <span class="fab-text">SOS</span>
-</button>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-tab="map">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Map</span>
+        </button>
+        <button class="nav-btn" data-tab="reports">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Reports</span>
+        </button>
+        <button class="nav-btn" data-tab="alerts">
+            <i class="fas fa-bell"></i>
+            <span>Alerts</span>
+        </button>
+        <button class="nav-btn" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+    </nav>
 
-<!-- Bottom Navigation -->
-<nav class="bottom-nav">
-    <a href="index.html" class="nav-item active">
-        <span class="nav-icon">🗺️</span>
-        <span class="nav-label">Map</span>
-    </a>
-    <a href="alerts.html" class="nav-item">
-        <span class="nav-icon">⚠️</span>
-        <span class="nav-label">Alerts</span>
-    </a>
-    <a href="help.html" class="nav-item">
-        <span class="nav-icon">🆘</span>
-        <span class="nav-label">Help</span>
-    </a>
-</nav>
+    <!-- Modal for Adding Places -->
+    <div id="place-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Add Flood Report</h2>
+            <form id="place-form">
+                <div class="form-group">
+                    <label for="place-name">Place Name</label>
+                    <input type="text" id="place-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="place-type">Type</label>
+                    <select id="place-type" required>
+                        <option value="flood">Flood Area</option>
+                        <option value="landslide">Landslide Risk</option>
+                        <option value="road-block">Blocked Road</option>
+                        <option value="safe-zone">Safe Zone</option>
+                        <option value="rescue-needed">Rescue Needed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="place-description">Description</label>
+                    <textarea id="place-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="place-severity">Severity Level</label>
+                    <select id="place-severity" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit for Approval</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <h2>Pending Approvals</h2>
+        <div id="pending-reports" class="reports-list">
+            <!-- Reports will be loaded here dynamically -->
+        </div>
+    </div>
+</main>
 
 <!-- Scripts -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="js/main.js"></script>
 <script src="js/map.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/form.js"></script>
 </body>
 </html>
