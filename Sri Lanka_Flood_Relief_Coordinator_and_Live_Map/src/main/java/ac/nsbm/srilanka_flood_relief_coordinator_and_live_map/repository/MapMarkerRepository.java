@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MapMarkerRepository extends JpaRepository<MapMarker, Long> {
-    List<MapMarker> findByType(String type);
+    List<MapMarker> findByStatus(String status);
 }

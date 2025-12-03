@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/help-requests")
-@CrossOrigin(origins = "*")
 public class HelpRequestController {
 
     @Autowired

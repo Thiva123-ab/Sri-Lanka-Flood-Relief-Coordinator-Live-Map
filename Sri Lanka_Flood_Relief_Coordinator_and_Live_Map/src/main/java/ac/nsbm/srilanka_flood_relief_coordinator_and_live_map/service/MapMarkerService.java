@@ -4,6 +4,7 @@ import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.model.MapMarker;
 import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.repository.MapMarkerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -12,11 +13,27 @@ public class MapMarkerService {
     @Autowired
     private MapMarkerRepository mapMarkerRepository;
 
-    public List<MapMarker> getAllMarkers() {
-        return mapMarkerRepository.findAll();
+    public List<MapMarker> getApprovedMarkers() {
+        return mapMarkerRepository.findByStatus("approved");
     }
 
-    public MapMarker addMarker(MapMarker marker) {
+    public List<MapMarker> getPendingMarkers() {
+        return mapMarkerRepository.findByStatus("pending");
+    }
+
+    public MapMarker reportIssue(MapMarker marker) {
+        marker.setStatus("pending"); // Default status
+        marker.setTimestamp(LocalDateTime.now());
         return mapMarkerRepository.save(marker);
+    }
+
+    public void approveMarker(Long id) {
+        MapMarker marker = mapMarkerRepository.findById(id).orElseThrow();
+        marker.setStatus("approved");
+        mapMarkerRepository.save(marker);
+    }
+
+    public void rejectMarker(Long id) {
+        mapMarkerRepository.deleteById(id);
     }
 }

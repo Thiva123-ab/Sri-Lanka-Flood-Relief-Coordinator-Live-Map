@@ -1,27 +1,49 @@
 package ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.controller;
 
 import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.model.MapMarker;
-import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.repository.MapMarkerRepository;
+import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.service.MapMarkerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/markers")
-@CrossOrigin(origins = "*") // Allow frontend to access this
 public class MapController {
 
     @Autowired
-    private MapMarkerRepository mapMarkerRepository;
+    private MapMarkerService mapMarkerService;
 
-    @GetMapping
-    public List<MapMarker> getAllMarkers() {
-        return mapMarkerRepository.findAll();
+    // Public: Get only approved markers for the live map
+    @GetMapping("/approved")
+    public List<MapMarker> getPublicMarkers() {
+        return mapMarkerService.getApprovedMarkers();
     }
 
-    @PostMapping
-    public MapMarker addMarker(@RequestBody MapMarker marker) {
-        return mapMarkerRepository.save(marker);
+    // Admin: Get pending markers for review
+    @GetMapping("/pending")
+    public List<MapMarker> getPendingMarkers() {
+        return mapMarkerService.getPendingMarkers();
+    }
+
+    // Member: Report a new issue
+    @PostMapping("/report")
+    public MapMarker reportIssue(@RequestBody MapMarker marker) {
+        return mapMarkerService.reportIssue(marker);
+    }
+
+    // Admin: Approve
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<?> approveMarker(@PathVariable Long id) {
+        mapMarkerService.approveMarker(id);
+        return ResponseEntity.ok("Marker Approved");
+    }
+
+    // Admin: Reject
+    @DeleteMapping("/{id}/reject")
+    public ResponseEntity<?> rejectMarker(@PathVariable Long id) {
+        mapMarkerService.rejectMarker(id);
+        return ResponseEntity.ok("Marker Rejected");
     }
 }
