@@ -1,0 +1,378 @@
+/* Base styles for Sri Lanka Flood Relief Coordinator */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+    padding-bottom: 70px; /* Space for bottom navigation */
+}
+
+/* Header styles */
+header {
+    background-color: #1a3c6c;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-text {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.logo-icon {
+    font-size: 1.8rem;
+    margin-right: 8px;
+}
+
+.logo-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+header h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.language-selector select {
+    background-color: #fff;
+    color: #1a3c6c;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Filter controls */
+.filter-controls {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #ddd;
+}
+
+.filter-btn {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background-color: #1a3c6c;
+    color: white;
+    border-color: #1a3c6c;
+}
+
+/* Map container */
+#map {
+    height: calc(100vh - 180px); /* Adjust for header, filters, and bottom nav */
+    width: 100%;
+}
+
+/* Floating Action Button */
+.fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.fab-text {
+    font-size: 1rem;
+}
+
+/* Alerts feed */
+.alerts-feed {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.alerts-feed h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1a3c6c;
+}
+
+/* Alert card */
+.alert-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 5px solid #ffc107;
+}
+
+.alert-card.immediate {
+    border-left-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+.alert-card.watch {
+    border-left-color: #ffc107;
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.alert-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.alert-source {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.alert-content {
+    margin-bottom: 10px;
+}
+
+.alert-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.share-btn {
+    background-color: #1a3c6c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.share-btn:hover {
+    background-color: #0f2a4d;
+}
+
+/* Help form styles */
+.help-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.help-form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1a3c6c;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.location-btn {
+    background-color: #1a3c6c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.location-btn:hover {
+    background-color: #0f2a4d;
+}
+
+.location-display {
+    font-size: 0.9rem;
+    color: #6c757d;
+    min-height: 20px;
+}
+
+.needs-selection {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.need-btn {
+    background-color: #e9ecef;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.need-btn.selected {
+    background-color: #1a3c6c;
+    color: white;
+    border-color: #1a3c6c;
+}
+
+.submit-btn {
+    background-color: #1a3c6c;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: 100%;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #0f2a4d;
+}
+
+.form-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    display: none;
+}
+
+.form-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+
+.form-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+
+/* Bottom navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background-color: #1a3c6c;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-item {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.nav-item.active,
+.nav-item:hover {
+    color: white;
+}
+
+.nav-icon {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .needs-selection {
+        grid-template-columns: 1fr;
+    }
+
+    .alert-header {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .alert-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .share-btn {
+        align-self: flex-end;
+    }
+
+    .logo-name {
+        font-size: 1rem;
+    }
+
+    header h1 {
+        font-size: 1rem;
+    }
+}
