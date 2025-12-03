@@ -320,8 +320,8 @@ class FloodReliefApp {
         // Navigate to the appropriate page
         switch(tabName) {
             case 'map':
-                if (!window.location.pathname.includes('index.html')) {
-                    window.location.href = 'index.html';
+                if (!window.location.pathname.includes('map.html')) {
+                    window.location.href = 'map.html';
                 }
                 break;
             case 'reports':

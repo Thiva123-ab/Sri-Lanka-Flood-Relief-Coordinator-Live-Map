@@ -56,7 +56,7 @@ class DashboardManager {
         const viewMapBtn = document.getElementById('view-map-btn');
         if (viewMapBtn) {
             viewMapBtn.addEventListener('click', () => {
-                window.location.href = 'index.html';
+                window.location.href = 'map.html';
             });
         }
 

@@ -44,9 +44,9 @@ class AuthManager {
 
         // Redirect based on role
         if (role === 'admin') {
-            window.location.href = 'index.html'; // Admins go to the main dashboard
+            window.location.href = 'map.html'; // Admins go to the map page
         } else {
-            window.location.href = 'index.html'; // Members also go to the main dashboard
+            window.location.href = 'map.html'; // Members also go to the map page
         }
         return true;
     }
