@@ -5,18 +5,15 @@ class FormHandler {
     }
 
     init() {
-        // Set up form event listeners
         this.setupFormListeners();
     }
 
     setupFormListeners() {
-        // Login form
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
             loginForm.addEventListener('submit', (e) => this.handleLogin(e));
         }
 
-        // Registration form
         const registerForm = document.getElementById('register-form');
         if (registerForm) {
             registerForm.addEventListener('submit', (e) => this.handleRegister(e));
@@ -25,20 +22,16 @@ class FormHandler {
 
     handleLogin(e) {
         e.preventDefault();
-
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const role = document.getElementById('role').value;
 
-        // Simple validation
         if (!username || !password) {
             alert('Please fill in all fields');
             return;
         }
 
-        // In a real app, this would be an API call
         if (window.authManager) {
-            window.authManager.login(username, password, role);
+            window.authManager.login(username, password);
         }
     }
 
@@ -51,7 +44,6 @@ class FormHandler {
         const confirmPassword = document.getElementById('reg-confirm-password').value;
         const role = document.getElementById('reg-role').value;
 
-        // Validation
         if (!username || !email || !password || !confirmPassword) {
             alert('Please fill in all fields');
             return;
@@ -62,13 +54,32 @@ class FormHandler {
             return;
         }
 
-        // In a real app, this would be an API call
-        alert('Registration successful! Please log in.');
-        window.location.href = 'login.html';
+        fetch('http://localhost:8080/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password,
+                role: role.toUpperCase()
+            })
+        })
+            .then(async response => {
+                if (response.ok) {
+                    alert('Registration successful! Please log in.');
+                    window.location.href = 'login.html';
+                } else {
+                    const errorText = await response.text();
+                    alert('Registration failed: ' + errorText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Cannot connect to server. Ensure backend is running.');
+            });
     }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.formHandler = new FormHandler();
 });

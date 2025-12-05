@@ -20,18 +20,23 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:8080")); // Allow frontend
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    // CHANGE: Allow ALL origins (fixes the localhost:63342 issue)
+                    config.setAllowedOriginPatterns(List.of("*"));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
+                    config.setAllowCredentials(true);
                     return config;
                 }))
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this stage
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/", "/index.html", "/login.html", "/register.html", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/markers/approved").permitAll() // Public map data
                         .requestMatchers("/api/alerts").permitAll() // Public alerts
+
+                        // Handle OPTIONS requests (pre-flight checks for CORS)
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Admin endpoints
                         .requestMatchers("/admin.html").hasAuthority("ADMIN")
@@ -43,7 +48,6 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-                // Use Basic Auth for simplicity with the provided JS fetch calls
                 .httpBasic(basic -> {});
 
         return http.build();
