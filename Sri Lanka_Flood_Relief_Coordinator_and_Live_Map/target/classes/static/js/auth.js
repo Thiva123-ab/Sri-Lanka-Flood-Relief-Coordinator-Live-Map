@@ -36,7 +36,6 @@ class AuthManager {
 
     login(username, password) {
         // Backend API call for Login
-        // Ensure this matches your backend URL (usually port 8080)
         fetch('http://localhost:8080/api/auth/login', {
             method: 'POST',
             headers: {
@@ -76,7 +75,8 @@ class AuthManager {
     logout() {
         this.currentUser = null;
         localStorage.removeItem('floodReliefUser');
-        window.location.href = 'login.html';
+        // FIX: Redirect to index.html instead of login.html
+        window.location.href = 'index.html';
     }
 
     updateUI() {
