@@ -3,100 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Help - Sri Lanka Flood Relief Coordinator</title>
+    <title>Help - Flood Relief Sri Lanka</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+<!-- Language Selector -->
+<div class="language-selector">
+    <button id="lang-en" class="lang-btn active">EN</button>
+    <button id="lang-si" class="lang-btn">සිං</button>
+    <button id="lang-ta" class="lang-btn">த</button>
+</div>
+
 <!-- Header -->
-<header>
-    <div class="logo-container">
-        <div class="logo-text">
-            <span class="logo-icon">🌊</span>
-            <span class="logo-name">FloodRelief</span>
-        </div>
-        <h1>Flood Relief SL</h1>
+<header class="app-header">
+    <div class="logo">
+        <h1>🌊 Flood Relief SL</h1>
     </div>
-    <div class="language-selector">
-        <select id="languageSelect">
-            <option value="en">English</option>
-            <option value="si">සිංහල</option>
-            <option value="ta">தமிழ்</option>
-        </select>
+    <div class="user-info">
+        <span id="user-role">Member</span>
+        <button id="logout-btn" class="btn btn-secondary">Logout</button>
     </div>
 </header>
 
-<!-- Help Request Form -->
-<main class="help-form-container">
-    <h2>Request Emergency Help</h2>
-    <form id="helpForm">
-        <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" required>
-        </div>
-
-        <div class="form-group">
-            <label>Current Location</label>
-            <button type="button" id="getLocationBtn" class="location-btn">
-                Use My Current Location
-            </button>
-            <div id="locationDisplay" class="location-display"></div>
-            <input type="hidden" id="latitude" name="latitude">
-            <input type="hidden" id="longitude" name="longitude">
-        </div>
-
-        <div class="form-group">
-            <label>Select Your Needs</label>
-            <div class="needs-selection">
-                <button type="button" class="need-btn" data-need="medicine">
-                    💊 Medicine
-                </button>
-                <button type="button" class="need-btn" data-need="food">
-                    🍲 Food/Water
-                </button>
-                <button type="button" class="need-btn" data-need="rescue">
-                    🚤 Boat Rescue
-                </button>
-                <button type="button" class="need-btn" data-need="baby">
-                    👶 Baby Supplies
-                </button>
+<!-- Main Content -->
+<main class="main-container">
+    <div class="help-container">
+        <h1>Request Help</h1>
+        <form id="help-form" class="help-form">
+            <div class="form-group">
+                <label for="help-name">Full Name</label>
+                <input type="text" id="help-name" placeholder="Enter your full name" required>
             </div>
-            <input type="hidden" id="needs" name="needs">
+
+            <div class="form-group">
+                <label for="help-phone">Phone Number</label>
+                <input type="tel" id="help-phone" placeholder="Enter your phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="help-location">Current Location</label>
+                <input type="text" id="help-location" placeholder="Describe your location" required>
+            </div>
+
+            <div class="form-group">
+                <label for="help-type">Type of Help Needed</label>
+                <select id="help-type" required>
+                    <option value="">Select type of help</option>
+                    <option value="rescue">Rescue</option>
+                    <option value="food">Food and Water</option>
+                    <option value="medical">Medical Assistance</option>
+                    <option value="shelter">Temporary Shelter</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="help-description">Description</label>
+                <textarea id="help-description" rows="4" placeholder="Describe your situation in detail..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="help-urgent" required>
+                    This is an urgent request
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Send Help Request</button>
+        </form>
+
+        <div class="help-info">
+            <h2>Emergency Contacts</h2>
+            <div class="contacts">
+                <div class="contact-card">
+                    <h3><i class="fas fa-ambulance"></i> Ambulance</h3>
+                    <p>110</p>
+                </div>
+                <div class="contact-card">
+                    <h3><i class="fas fa-fire-extinguisher"></i> Fire & Rescue</h3>
+                    <p>110</p>
+                </div>
+                <div class="contact-card">
+                    <h3><i class="fas fa-phone"></i> Police</h3>
+                    <p>119</p>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="details">Additional Details</label>
-            <textarea id="details" name="details" rows="3" placeholder="Any additional information that might help rescuers..."></textarea>
-        </div>
-
-        <button type="submit" class="submit-btn">Submit Request</button>
-    </form>
-
-    <div id="formMessage" class="form-message"></div>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn" data-tab="map">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Map</span>
+        </button>
+        <button class="nav-btn" data-tab="reports">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Reports</span>
+        </button>
+        <button class="nav-btn" data-tab="alerts">
+            <i class="fas fa-bell"></i>
+            <span>Alerts</span>
+        </button>
+        <button class="nav-btn active" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+    </nav>
 </main>
 
-<!-- Bottom Navigation -->
-<nav class="bottom-nav">
-    <a href="index.html" class="nav-item">
-        <span class="nav-icon">🗺️</span>
-        <span class="nav-label">Map</span>
-    </a>
-    <a href="alerts.html" class="nav-item">
-        <span class="nav-icon">⚠️</span>
-        <span class="nav-label">Alerts</span>
-    </a>
-    <a href="help.html" class="nav-item active">
-        <span class="nav-icon">🆘</span>
-        <span class="nav-label">Help</span>
-    </a>
-</nav>
+<!-- Footer -->
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <h2>🌊 Flood Relief SL</h2>
+            <p>Protecting Sri Lankan communities from flood risks</p>
+        </div>
+        <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="map.html">Live Map</a></li>
+                <li><a href="alerts.html">Alerts</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </ul>
+        </div>
+        <div class="footer-contact">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
+            <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+    </div>
+</footer>
 
-<!-- Scripts -->
+<script src="js/auth.js"></script>
 <script src="js/main.js"></script>
-<script src="js/form.js"></script>
 </body>
 </html>

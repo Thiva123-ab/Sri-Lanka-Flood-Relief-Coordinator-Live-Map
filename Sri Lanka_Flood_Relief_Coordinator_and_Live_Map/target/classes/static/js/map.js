@@ -1,214 +1,166 @@
-// Map functionality for Sri Lanka Flood Relief Coordinator
+// Map Controller using Leaflet
+class MapController {
+    constructor() {
+        this.map = null;
+        this.markers = [];
+        this.init();
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the map
-    const map = L.map('map').setView([7.8731, 80.7718], 8); // Centered on Sri Lanka
+    init() {
+        // Initialize the map
+        this.initializeMap();
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+        // Add sample markers
+        this.addSampleMarkers();
 
-    // Sample data for markers (in a real app, this would come from an API)
-    const sampleMarkers = [
-        {
-            type: 'shelter',
-            lat: 6.5854,
-            lng: 79.9607,
-            name: 'Kalutara Temple Shelter',
-            capacity: 200,
-            contact: '034-222-2222'
-        },
-        {
-            type: 'shelter',
-            lat: 6.8423,
-            lng: 79.9647,
-            name: 'Gampaha Community Center',
-            capacity: 150,
-            contact: '033-222-3333'
-        },
-        {
-            type: 'flood',
-            lat: 6.5700,
-            lng: 79.9800,
-            name: 'Severe Flooding Reported',
-            depth: '1.5m',
-            reportedBy: 'Local Resident'
-        },
-        {
-            type: 'flood',
-            lat: 6.8347,
-            lng: 79.9500,
-            name: 'Road Blocked by Flood',
-            depth: '2m',
-            reportedBy: 'Community Volunteer'
-        },
-        {
-            type: 'supply',
-            lat: 6.5800,
-            lng: 79.9700,
-            name: 'Water Distribution Point',
-            hours: '8AM-6PM',
-            contact: '077-123-4567'
-        },
-        {
-            type: 'supply',
-            lat: 6.8400,
-            lng: 79.9600,
-            name: 'Food Distribution Center',
-            hours: '9AM-5PM',
-            contact: '076-987-6543'
-        }
-    ];
+        // Load approved places from storage
+        this.loadApprovedPlaces();
+    }
 
-    // Create markers with custom icons
-    const markers = [];
+    initializeMap() {
+        // Set up the map centered on Sri Lanka
+        this.map = L.map('map').setView([7.8731, 80.7718], 8); // Center of Sri Lanka
 
-    sampleMarkers.forEach(location => {
-        let markerIcon;
-        let markerClass;
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(this.map);
 
-        switch(location.type) {
-            case 'shelter':
-                markerIcon = L.divIcon({
-                    className: 'shelter-marker',
-                    html: '🏠',
-                    iconSize: [24, 24]
-                });
-                markerClass = 'shelter-marker';
-                break;
-            case 'flood':
-                markerIcon = L.divIcon({
-                    className: 'flood-marker',
-                    html: '🌊',
-                    iconSize: [24, 24]
-                });
-                markerClass = 'flood-marker';
-                break;
-            case 'supply':
-                markerIcon = L.divIcon({
-                    className: 'supply-marker',
-                    html: '📦',
-                    iconSize: [24, 24]
-                });
-                markerClass = 'supply-marker';
-                break;
-        }
+        // Add a scale control
+        L.control.scale().addTo(this.map);
+    }
 
-        const marker = L.marker([location.lat, location.lng], {icon: markerIcon}).addTo(map);
+    addSampleMarkers() {
+        // Add some sample markers for demonstration
+        const samplePlaces = [
+            {
+                name: "Colombo",
+                type: "flood",
+                lat: 6.9271,
+                lng: 79.8612,
+                description: "Capital city with periodic flooding"
+            },
+            {
+                name: "Kandy",
+                type: "landslide",
+                lat: 7.2906,
+                lng: 80.6337,
+                description: "Hill country prone to landslides"
+            },
+            {
+                name: "Galle",
+                type: "safe-zone",
+                lat: 6.0535,
+                lng: 80.2210,
+                description: "Community center available for shelter"
+            }
+        ];
 
-        // Create popup content
-        let popupContent = `
-            <div class="marker-popup">
-                <h3>${location.name}</h3>
-        `;
-
-        if (location.type === 'shelter') {
-            popupContent += `
-                <span class="marker-type shelter-type">Safe Shelter</span>
-                <p><strong>Capacity:</strong> ${location.capacity} people</p>
-                <p><strong>Contact:</strong> ${location.contact}</p>
-            `;
-        } else if (location.type === 'flood') {
-            popupContent += `
-                <span class="marker-type flood-type">Flood Report</span>
-                <p><strong>Water Depth:</strong> ${location.depth}</p>
-                <p><strong>Reported By:</strong> ${location.reportedBy}</p>
-            `;
-        } else if (location.type === 'supply') {
-            popupContent += `
-                <span class="marker-type supply-type">Supply Point</span>
-                <p><strong>Hours:</strong> ${location.hours}</p>
-                <p><strong>Contact:</strong> ${location.contact}</p>
-            `;
-        }
-
-        popupContent += `
-            </div>
-        `;
-
-        marker.bindPopup(popupContent);
-        markers.push({marker, type: location.type});
-    });
-
-    // Add legend to map
-    const legend = L.control({position: 'bottomright'});
-
-    legend.onAdd = function(map) {
-        const div = L.DomUtil.create('div', 'map-legend');
-        div.innerHTML = `
-            <div class="legend-item">
-                <span class="legend-color shelter"></span>
-                <span>Shelters</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color flood"></span>
-                <span>Flood Reports</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color supply"></span>
-                <span>Supply Points</span>
-            </div>
-        `;
-        return div;
-    };
-
-    legend.addTo(map);
-
-    // Filter functionality
-    const filterButtons = document.querySelectorAll('.filter-btn');
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Update active button
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-
-            const filterType = this.getAttribute('data-filter');
-
-            // Show/hide markers based on filter
-            markers.forEach(markerObj => {
-                if (filterType === 'all' || markerObj.type === filterType) {
-                    markerObj.marker.addTo(map);
-                } else {
-                    map.removeLayer(markerObj.marker);
-                }
-            });
-        });
-    });
-
-    // SOS button functionality
-    const sosButton = document.getElementById('requestHelpBtn');
-    if (sosButton) {
-        sosButton.addEventListener('click', function() {
-            // Redirect to help page
-            window.location.href = 'help.html';
+        samplePlaces.forEach(place => {
+            this.addMarker(place);
         });
     }
 
-    // Try to get user's location and center map
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-                map.setView([userLat, userLng], 13);
+    addMarker(place) {
+        // Define marker icons based on type
+        const iconColors = {
+            'flood': '#2196F3',
+            'landslide': '#FF9800',
+            'road-block': '#9E9E9E',
+            'safe-zone': '#4CAF50',
+            'rescue-needed': '#F44336'
+        };
 
-                // Add user location marker
-                const userIcon = L.divIcon({
-                    className: 'user-location-marker',
-                    html: '📍',
-                    iconSize: [24, 24]
+        const markerIcon = L.divIcon({
+            className: `custom-marker marker-${place.type}`,
+            html: `<div class="marker-icon" style="background-color: ${iconColors[place.type] || '#2196F3'}">
+                     <i class="fas fa-${this.getIconForType(place.type)}"></i>
+                   </div>`,
+            iconSize: [30, 40],
+            iconAnchor: [15, 40]
+        });
+
+        // Create marker
+        const marker = L.marker([place.lat, place.lng], { icon: markerIcon }).addTo(this.map);
+
+        // Add popup
+        marker.bindPopup(`
+            <div class="popup-content">
+                <h3>${place.name}</h3>
+                <p><strong>Type:</strong> ${place.type}</p>
+                <p>${place.description}</p>
+            </div>
+        `);
+
+        // Store reference
+        this.markers.push({
+            id: place.id || Date.now(),
+            marker: marker,
+            data: place
+        });
+
+        return marker;
+    }
+
+    getIconForType(type) {
+        const icons = {
+            'flood': 'water',
+            'landslide': 'mountain',
+            'road-block': 'ban',
+            'safe-zone': 'home',
+            'rescue-needed': 'exclamation-triangle'
+        };
+        return icons[type] || 'map-marker-alt';
+    }
+
+    addApprovedPlace(place) {
+        // Convert place data to marker format
+        const markerData = {
+            id: place.id,
+            name: place.name,
+            type: place.type,
+            lat: place.lat || 7.8731 + (Math.random() - 0.5) * 2, // Random for demo
+            lng: place.lng || 80.7718 + (Math.random() - 0.5) * 2, // Random for demo
+            description: place.description
+        };
+
+        this.addMarker(markerData);
+    }
+
+    loadApprovedPlaces() {
+        // In a real app, this would fetch from a server
+        const savedApproved = localStorage.getItem('approvedReports');
+        if (savedApproved) {
+            const approvedReports = JSON.parse(savedApproved);
+            approvedReports
+                .filter(report => report.status === 'approved')
+                .forEach(report => {
+                    this.addApprovedPlace(report);
                 });
+        }
+    }
 
-                L.marker([userLat, userLng], {icon: userIcon})
-                    .addTo(map)
-                    .bindPopup('Your Location')
-                    .openPopup();
-            },
-            function(error) {
-                console.log('Unable to get user location:', error);
-            }
-        );
+    // Method to center map on user's location
+    locateUser() {
+        this.map.locate({ setView: true, maxZoom: 16 });
+
+        // Handle location found
+        this.map.on('locationfound', (e) => {
+            L.marker(e.latlng).addTo(this.map)
+                .bindPopup('You are here').openPopup();
+        });
+
+        // Handle location error
+        this.map.on('locationerror', (e) => {
+            alert("Unable to locate your position");
+        });
+    }
+}
+
+// Initialize map when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Only initialize if we're on the main page with a map
+    if (document.getElementById('map')) {
+        window.mapController = new MapController();
     }
 });

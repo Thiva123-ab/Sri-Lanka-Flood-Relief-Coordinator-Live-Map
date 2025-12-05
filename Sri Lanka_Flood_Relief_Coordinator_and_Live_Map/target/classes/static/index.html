@@ -3,65 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sri Lanka Flood Relief Coordinator</title>
+    <title>Flood Relief Sri Lanka - Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/map.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+<!-- Language Selector -->
+<div class="language-selector">
+    <button id="lang-en" class="lang-btn active">EN</button>
+    <button id="lang-si" class="lang-btn">සිං</button>
+    <button id="lang-ta" class="lang-btn">த</button>
+</div>
+
 <!-- Header -->
-<header>
-    <div class="logo-container">
-        <div class="logo-text">
-            <span class="logo-icon">🌊</span>
-            <span class="logo-name">FloodRelief</span>
-        </div>
-        <h1>Flood Relief SL</h1>
+<header class="app-header">
+    <div class="logo">
+        <h1>🌊 Flood Relief SL</h1>
     </div>
-    <div class="language-selector">
-        <select id="languageSelect">
-            <option value="en">English</option>
-            <option value="si">සිංහල</option>
-            <option value="ta">தமிழ்</option>
-        </select>
+    <div class="user-info">
+        <span id="user-role">Guest</span>
+        <button id="login-btn" class="btn btn-secondary">Login</button>
     </div>
 </header>
 
-<!-- Filter Controls -->
-<div class="filter-controls">
-    <button class="filter-btn active" data-filter="all">All</button>
-    <button class="filter-btn" data-filter="shelters">Shelters</button>
-    <button class="filter-btn" data-filter="floods">Flood Reports</button>
-    <button class="filter-btn" data-filter="supplies">Supply Points</button>
-</div>
+<!-- Main Content -->
+<main class="dashboard-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Flood Relief Sri Lanka</h1>
+            <p>Real-time flood mapping and emergency response platform for Sri Lankan communities</p>
+            <div class="hero-buttons">
+                <button id="get-started-btn" class="btn btn-primary">Get Started</button>
+                <button id="view-map-btn" class="btn btn-secondary">View Live Map</button>
+            </div>
+        </div>
+    </section>
 
-<!-- Map Container -->
-<main id="map"></main>
+    <!-- Services Section -->
+    <section class="services-section">
+        <h2>Our Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <i class="fas fa-map-marked-alt service-icon"></i>
+                <h3>Live Flood Mapping</h3>
+                <p>Real-time interactive map showing flood-affected areas, danger zones, and safe shelters</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-bell service-icon"></i>
+                <h3>Emergency Alerts</h3>
+                <p>Verified government alerts and community warnings delivered directly to your device</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-exclamation-triangle service-icon"></i>
+                <h3>Community Reporting</h3>
+                <p>Report flood conditions, blocked roads, and rescue needs with our simple reporting system</p>
+            </div>
+            <div class="service-card">
+                <i class="fas fa-hands-helping service-icon"></i>
+                <h3>Help Requests</h3>
+                <p>Quickly request emergency assistance with automatic location detection</p>
+            </div>
+        </div>
+    </section>
 
-<!-- Floating Action Button -->
-<button class="fab" id="requestHelpBtn">
-    <span class="fab-text">SOS</span>
-</button>
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Multi-language Support</h3>
+                <p>Available in English, Sinhala, and Tamil to serve all Sri Lankan communities</p>
+            </div>
+            <div class="feature-card">
+                <h3>Mobile Optimized</h3>
+                <p>Designed for smartphones with large buttons and easy navigation for stressful situations</p>
+            </div>
+            <div class="feature-card">
+                <h3>Offline Capability</h3>
+                <p>Works in low-connectivity areas with offline form submission</p>
+            </div>
+            <div class="feature-card">
+                <h3>Role-based Access</h3>
+                <p>Separate interfaces for community members and emergency responders</p>
+            </div>
+            <div class="feature-card">
+                <h3>Real-time Updates</h3>
+                <p>Instant notifications for new reports and emergency alerts</p>
+            </div>
+            <div class="feature-card">
+                <h3>Verification System</h3>
+                <p>All reports are verified by authorized personnel before appearing on public maps</p>
+            </div>
+        </div>
+    </section>
 
-<!-- Bottom Navigation -->
-<nav class="bottom-nav">
-    <a href="index.html" class="nav-item active">
-        <span class="nav-icon">🗺️</span>
-        <span class="nav-label">Map</span>
-    </a>
-    <a href="alerts.html" class="nav-item">
-        <span class="nav-icon">⚠️</span>
-        <span class="nav-label">Alerts</span>
-    </a>
-    <a href="help.html" class="nav-item">
-        <span class="nav-icon">🆘</span>
-        <span class="nav-label">Help</span>
-    </a>
-</nav>
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <h2>Community Impact</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3><i class="fas fa-users"></i> Communities Served</h3>
+                <p id="communities-count">120+</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-map-marker-alt"></i> Locations Reported</h3>
+                <p id="locations-count">2,500+</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-bell"></i> Alerts Issued</h3>
+                <p id="alerts-count">180+</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-hands-helping"></i> Rescues Facilitated</h3>
+                <p id="rescues-count">450+</p>
+            </div>
+        </div>
+    </section>
 
-<!-- Scripts -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="js/main.js"></script>
-<script src="js/map.js"></script>
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <h2>Join Our Community</h2>
+        <p>Be part of the solution. Sign up today to help protect your community from flood risks.</p>
+        <button id="signup-btn" class="btn btn-primary">Sign Up Now</button>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <h2>🌊 Flood Relief SL</h2>
+            <p>Protecting Sri Lankan communities from flood risks</p>
+        </div>
+        <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="map.html">Live Map</a></li>
+                <li><a href="alerts.html">Alerts</a></li>
+                <li><a href="help.html">Help Request</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </ul>
+        </div>
+        <div class="footer-contact">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
+            <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>

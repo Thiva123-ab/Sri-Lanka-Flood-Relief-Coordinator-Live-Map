@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flood Relief Sri Lanka - Live Map</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<!-- Language Selector -->
+<div class="language-selector">
+  <button id="lang-en" class="lang-btn active">EN</button>
+  <button id="lang-si" class="lang-btn">සිං</button>
+  <button id="lang-ta" class="lang-btn">த</button>
+</div>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="logo">
+    <h1>🌊 Flood Relief SL</h1>
+  </div>
+  <div class="user-info">
+    <span id="user-role">Member</span>
+    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-container">
+  <!-- Map Container -->
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <button id="fab" class="fab">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="map">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>Map</span>
+    </button>
+    <button class="nav-btn" data-tab="reports">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>Reports</span>
+    </button>
+    <button class="nav-btn" data-tab="alerts">
+      <i class="fas fa-bell"></i>
+      <span>Alerts</span>
+    </button>
+    <button class="nav-btn" data-tab="profile">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <!-- Modal for Adding Places -->
+  <div id="place-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modal-title">Add Flood Report</h2>
+      <form id="place-form">
+        <div class="form-group">
+          <label for="place-name">Place Name</label>
+          <input type="text" id="place-name" required>
+        </div>
+        <div class="form-group">
+          <label for="place-type">Type</label>
+          <select id="place-type" required>
+            <option value="flood">Flood Area</option>
+            <option value="landslide">Landslide Risk</option>
+            <option value="road-block">Blocked Road</option>
+            <option value="safe-zone">Safe Zone</option>
+            <option value="rescue-needed">Rescue Needed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="place-description">Description</label>
+          <textarea id="place-description" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="place-severity">Severity Level</label>
+          <select id="place-severity" required>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit for Approval</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Panel (Hidden by default) -->
+  <div id="admin-panel" class="admin-panel" style="display: none;">
+    <h2>Pending Approvals</h2>
+    <div id="pending-reports" class="reports-list">
+      <!-- Reports will be loaded here dynamically -->
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+      <h2>🌊 Flood Relief SL</h2>
+      <p>Protecting Sri Lankan communities from flood risks</p>
+    </div>
+    <div class="footer-links">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="alerts.html">Alerts</a></li>
+        <li><a href="help.html">Help Request</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html">Register</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h3>Contact Us</h3>
+      <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
+      <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="js/map.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/form.js"></script>
+</body>
+</html>
