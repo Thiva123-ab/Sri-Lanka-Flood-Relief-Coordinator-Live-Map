@@ -59,29 +59,15 @@
         <h2>Create New Alert</h2>
         <form id="alert-form">
           <div class="form-group">
-            <label for="alert-title-en">Title (English)</label>
-            <input type="text" id="alert-title-en" required>
+            <label for="alert-title-en">Title</label>
+            <input type="text" id="alert-title-en" placeholder="Enter alert title" required>
           </div>
+
           <div class="form-group">
-            <label for="alert-title-si">Title (Sinhala)</label>
-            <input type="text" id="alert-title-si" required>
+            <label for="alert-description-en">Description</label>
+            <textarea id="alert-description-en" rows="4" placeholder="Enter alert details..." required></textarea>
           </div>
-          <div class="form-group">
-            <label for="alert-title-ta">Title (Tamil)</label>
-            <input type="text" id="alert-title-ta" required>
-          </div>
-          <div class="form-group">
-            <label for="alert-description-en">Description (English)</label>
-            <textarea id="alert-description-en" rows="3" required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="alert-description-si">Description (Sinhala)</label>
-            <textarea id="alert-description-si" rows="3" required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="alert-description-ta">Description (Tamil)</label>
-            <textarea id="alert-description-ta" rows="3" required></textarea>
-          </div>
+
           <div class="form-group">
             <label for="alert-level">Alert Level</label>
             <select id="alert-level" required>
@@ -91,10 +77,12 @@
               <option value="critical">Critical</option>
             </select>
           </div>
+
           <div class="form-group">
             <label for="alert-location">Location</label>
-            <input type="text" id="alert-location" placeholder="Affected area" required>
+            <input type="text" id="alert-location" placeholder="Affected area (e.g., Western Province)" required>
           </div>
+
           <button type="submit" class="btn btn-primary">Create Alert</button>
         </form>
       </div>

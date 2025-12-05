@@ -1,3 +1,5 @@
+// Source: Sri Lanka_Flood_Relief_Coordinator_and_Live_Map/src/main/resources/static/js/main.js
+
 // Main Application Controller
 class FloodReliefApp {
     constructor() {
@@ -11,23 +13,19 @@ class FloodReliefApp {
         // Initialize components
         this.setupEventListeners();
         this.loadSampleData();
-        this.updateLanguage();
+        // this.updateLanguage(); // Removed language logic
 
-        // Load pending reports for admin
-        if (window.authManager && window.authManager.isAdmin()) {
+        // Load data based on page
+        const path = window.location.pathname;
+
+        if (path.includes('report.html')) {
+            this.loadPublicReports();
+        } else if (window.authManager && window.authManager.isAdmin()) {
             this.loadPendingReports();
         }
     }
 
     setupEventListeners() {
-        // Language selector
-        const langButtons = document.querySelectorAll('.lang-btn');
-        langButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.changeLanguage(e.target.id.replace('lang-', ''));
-            });
-        });
-
         // FAB button
         const fab = document.getElementById('fab');
         if (fab) {
@@ -71,64 +69,6 @@ class FloodReliefApp {
         });
     }
 
-    changeLanguage(lang) {
-        this.currentLanguage = lang;
-
-        // Update active button
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById(`lang-${lang}`).classList.add('active');
-
-        // Update UI text
-        this.updateLanguage();
-    }
-
-    updateLanguage() {
-        // In a real app, this would load translated strings
-        const translations = {
-            en: {
-                'modal-title': 'Add Flood Report',
-                'place-name': 'Place Name',
-                'place-type': 'Type',
-                'place-description': 'Description',
-                'place-severity': 'Severity Level',
-                'submit-btn': 'Submit for Approval'
-            },
-            si: {
-                'modal-title': 'හෙරී වාර්තාව එක් කරන්න',
-                'place-name': 'ස්ථානයේ නම',
-                'place-type': 'වර්ගය',
-                'place-description': 'විස්තරය',
-                'place-severity': 'ප්‍රමාද මට්ටම',
-                'submit-btn': 'අනුමත කිරීම සඳහා යොමු කරන්න'
-            },
-            ta: {
-                'modal-title': 'வெள்ள அறிக்கையைச் சேர்க்கவும்',
-                'place-name': 'இடத்தின் பெயர்',
-                'place-type': 'வகை',
-                'place-description': 'விளக்கம்',
-                'place-severity': 'தீவிரத்தன்மை நிலை',
-                'submit-btn': 'அங்கீகாரத்திற்காக சமர்ப்பிக்கவும்'
-            }
-        };
-
-        const texts = translations[this.currentLanguage];
-        for (const [key, value] of Object.entries(texts)) {
-            const element = document.getElementById(key);
-            if (element) {
-                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT') {
-                    // For form elements, update placeholder or option text
-                    if (element.placeholder) {
-                        element.placeholder = value;
-                    }
-                } else {
-                    element.textContent = value;
-                }
-            }
-        }
-    }
-
     openPlaceModal() {
         const modal = document.getElementById('place-modal');
         if (modal) {
@@ -158,7 +98,7 @@ class FloodReliefApp {
         const placeDescription = document.getElementById('place-description').value;
         const placeSeverity = document.getElementById('place-severity').value;
 
-        // Create report object
+        // Base report object
         const report = {
             id: Date.now(),
             name: placeName,
@@ -170,6 +110,25 @@ class FloodReliefApp {
             timestamp: new Date().toISOString()
         };
 
+        // Try to get geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    report.lat = position.coords.latitude;
+                    report.lng = position.coords.longitude;
+                    this.saveAndCompleteReport(report);
+                },
+                (error) => {
+                    console.log("Geolocation error (using random fallback in MapController): " + error.message);
+                    this.saveAndCompleteReport(report);
+                }
+            );
+        } else {
+            this.saveAndCompleteReport(report);
+        }
+    }
+
+    saveAndCompleteReport(report) {
         // Save to pending reports
         this.pendingReports.push(report);
         this.saveReports();
@@ -186,8 +145,9 @@ class FloodReliefApp {
         }
     }
 
+    // --- Admin/Pending Report Logic ---
+
     loadPendingReports() {
-        // In a real app, this would fetch from a server
         const container = document.getElementById('pending-reports');
         if (!container) return;
 
@@ -225,6 +185,72 @@ class FloodReliefApp {
         `;
         return card;
     }
+
+    // --- Public Report Feed Logic ---
+
+    loadPublicReports() {
+        const container = document.getElementById('public-reports-list');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        // Filter approved reports
+        // In a real app, this would be a server fetch
+        const savedApproved = localStorage.getItem('approvedReports');
+        const approved = savedApproved ? JSON.parse(savedApproved) : [];
+
+        // Update stats
+        const totalCount = document.getElementById('total-reports-count');
+        const recentCount = document.getElementById('recent-reports-count');
+        if (totalCount) totalCount.textContent = approved.length;
+        if (recentCount) recentCount.textContent = approved.filter(r => {
+            const date = new Date(r.timestamp);
+            const now = new Date();
+            const diff = now - date;
+            return diff < (24 * 60 * 60 * 1000); // Last 24 hours
+        }).length;
+
+        if (approved.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #ccc; margin-top: 20px;">No verified incidents reported yet.</p>';
+            return;
+        }
+
+        // Sort by newest first
+        approved.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        approved.forEach(report => {
+            const reportCard = this.createPublicReportCard(report);
+            container.appendChild(reportCard);
+        });
+    }
+
+    createPublicReportCard(report) {
+        const card = document.createElement('div');
+        card.className = `report-card ${report.type}`;
+
+        // Format date
+        const date = new Date(report.timestamp);
+        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        card.innerHTML = `
+            <div class="report-header">
+                <div class="report-title">
+                    ${report.name}
+                    <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                </div>
+                <div class="report-type">${report.type.toUpperCase().replace('-', ' ')}</div>
+            </div>
+            <div class="report-description">${report.description}</div>
+            <div class="report-severity">Severity: <span style="font-weight: bold;">${report.severity.toUpperCase()}</span></div>
+            <div class="report-meta" style="margin-top: 10px; font-size: 0.85rem; color: #ccc; display: flex; justify-content: space-between;">
+                <span><i class="far fa-clock"></i> ${dateStr}</span>
+                <span><i class="far fa-user"></i> ${report.submittedBy}</span>
+            </div>
+        `;
+        return card;
+    }
+
+    // --- Action Handlers ---
 
     approveReport(reportId) {
         const report = this.pendingReports.find(r => r.id == reportId);
@@ -277,16 +303,6 @@ class FloodReliefApp {
                     status: "pending",
                     submittedBy: "user1",
                     timestamp: "2023-06-15T10:30:00Z"
-                },
-                {
-                    id: 2,
-                    name: "Kandy Road Block",
-                    type: "road-block",
-                    description: "Landslide blocking the road",
-                    severity: "medium",
-                    status: "pending",
-                    submittedBy: "user2",
-                    timestamp: "2023-06-15T11:45:00Z"
                 }
             ];
         }
@@ -311,11 +327,12 @@ class FloodReliefApp {
     }
 
     switchTab(tabName) {
-        // Update active nav button
+        // Update active nav button (UI only)
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
+        const activeBtn = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
 
         // Navigate to the appropriate page
         switch(tabName) {
@@ -325,8 +342,9 @@ class FloodReliefApp {
                 }
                 break;
             case 'reports':
-                // This would show reports on the main page
-                console.log('Showing reports');
+                if (!window.location.pathname.includes('report.html')) {
+                    window.location.href = 'report.html';
+                }
                 break;
             case 'alerts':
                 if (!window.location.pathname.includes('alerts.html')) {
@@ -350,21 +368,9 @@ class FloodReliefApp {
 
     handleHelpRequest(e) {
         e.preventDefault();
-
-        // Get form data
         const name = document.getElementById('help-name').value;
-        const phone = document.getElementById('help-phone').value;
-        const location = document.getElementById('help-location').value;
-        const type = document.getElementById('help-type').value;
-        const description = document.getElementById('help-description').value;
-
-        // In a real app, this would be sent to a server
-        console.log('Help request submitted:', { name, phone, location, type, description });
-
-        // Show confirmation
+        console.log('Help request submitted:', { name });
         alert('Help request submitted successfully! Emergency services will contact you soon.');
-
-        // Reset form
         e.target.reset();
     }
 }

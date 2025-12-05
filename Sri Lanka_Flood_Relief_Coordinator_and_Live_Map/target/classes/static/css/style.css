@@ -321,20 +321,19 @@ body {
 .btn {
     padding: 12px 30px;
     border: none;
-    border-radius: 50px; /* Modern Pill Shape */
+    border-radius: 50px;
     font-size: 16px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smooth bounce effect */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     width: 100%;
     position: relative;
     overflow: hidden;
     z-index: 1;
 }
 
-/* Glossy Shine Effect on Buttons */
 .btn::after {
     content: '';
     position: absolute;
@@ -352,7 +351,7 @@ body {
     opacity: 1;
 }
 
-/* Primary Button (Beautiful Green Gradient with Glow) */
+/* Primary Button */
 .btn-primary {
     background: linear-gradient(135deg, #00b09b, #96c93d);
     color: white;
@@ -365,7 +364,7 @@ body {
     box-shadow: 0 8px 25px rgba(0, 176, 155, 0.6);
 }
 
-/* Secondary Button (Beautiful Red/Pink Gradient with Glow) */
+/* Secondary Button */
 .btn-secondary {
     background: linear-gradient(135deg, #ff512f, #dd2476);
     color: white;
@@ -446,6 +445,22 @@ body {
 .report-title {
     font-weight: bold;
     font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Added Verified Badge */
+.verified-badge {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .report-type {
