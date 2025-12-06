@@ -16,7 +16,36 @@ body {
     position: relative;
 }
 
-/* Authentication Pages */
+/* --- ANIMATION KEYFRAMES --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* Authentication Pages (Login/Register) */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -36,6 +65,8 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     position: relative;
     z-index: 2;
+    /* Animation applied here */
+    animation: fadeInUp 0.8s ease-out forwards;
 }
 
 .auth-box .logo {
@@ -50,8 +81,8 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: gradientShift 3s ease infinite;
     background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
 }
 
 .auth-box .logo p {
@@ -110,12 +141,25 @@ body {
     gap: 15px;
 }
 
+/* --- MODERN BADGE STYLE (Glassmorphism) --- */
 #user-role {
-    background: linear-gradient(45deg, #4CAF50, #8BC34A);
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+#user-role:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
 }
 
 /* -------------------------------------------------
@@ -249,13 +293,9 @@ body {
     max-width: 500px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     position: relative;
-    animation: slideIn 0.3s ease;
+    /* Entrance Animation */
+    animation: fadeInUp 0.5s ease-out forwards;
     z-index: 1001;
-}
-
-@keyframes slideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
 
 .close {
@@ -283,9 +323,20 @@ body {
     color: transparent;
 }
 
+/* Form Groups with Staggered Animation */
 .form-group {
     margin-bottom: 20px;
+    opacity: 0; /* Start hidden */
+    animation: slideInRight 0.5s ease-out forwards;
 }
+
+/* Stagger delays for form elements (up to 6) */
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(5) { animation-delay: 0.5s; }
+.form-group:nth-child(6) { animation-delay: 0.6s; }
 
 .form-group label {
     display: block;
@@ -312,22 +363,24 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    transform: scale(1.02);
 }
 
 /* =========================================================
-   UPDATED BEAUTIFUL BUTTON STYLES
+   UPDATED BEAUTIFUL BUTTON STYLES (Modern Shape)
    ========================================================= */
 .btn {
     padding: 12px 30px;
     border: none;
-    border-radius: 50px;
+    border-radius: 50px; /* Modern Pill Shape */
     font-size: 16px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     width: 100%;
     position: relative;
     overflow: hidden;
@@ -351,12 +404,11 @@ body {
     opacity: 1;
 }
 
-/* Primary Button */
+/* Modern Primary Button */
 .btn-primary {
     background: linear-gradient(135deg, #00b09b, #96c93d);
     color: white;
-    box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 176, 155, 0.4);
 }
 
 .btn-primary:hover {
@@ -364,23 +416,48 @@ body {
     box-shadow: 0 8px 25px rgba(0, 176, 155, 0.6);
 }
 
-/* Secondary Button */
+/* Modern Secondary Button */
 .btn-secondary {
     background: linear-gradient(135deg, #ff512f, #dd2476);
     color: white;
-    box-shadow: 0 5px 15px rgba(221, 36, 118, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(255, 81, 47, 0.4);
 }
 
 .btn-secondary:hover {
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(221, 36, 118, 0.6);
+    box-shadow: 0 8px 25px rgba(255, 81, 47, 0.6);
 }
 
 /* Active State */
 .btn:active {
     transform: translateY(1px) scale(0.98);
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* --- SPECIFIC BUTTON MODERNIZATIONS --- */
+
+#login-btn, #logout-btn {
+    width: auto;
+    padding: 8px 25px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+}
+
+#get-started-btn {
+    width: auto;
+    padding: 15px 40px;
+    font-size: 18px;
+    background: linear-gradient(90deg, #1D976C 0%, #93F9B9 100%);
+    box-shadow: 0 5px 20px rgba(29, 151, 108, 0.5);
+}
+
+#view-map-btn {
+    width: auto;
+    padding: 15px 40px;
+    font-size: 18px;
+    background: linear-gradient(90deg, #FF512F 0%, #DD2476 100%);
+    box-shadow: 0 5px 20px rgba(221, 36, 118, 0.5);
 }
 
 /* Admin Panel */
@@ -423,7 +500,15 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     border-left: 5px solid #4CAF50;
+    /* List Item Animation */
+    animation: fadeInUp 0.5s ease-out backwards;
 }
+
+/* Stagger list item animations */
+.report-card:nth-child(1) { animation-delay: 0.1s; }
+.report-card:nth-child(2) { animation-delay: 0.2s; }
+.report-card:nth-child(3) { animation-delay: 0.3s; }
+.report-card:nth-child(4) { animation-delay: 0.4s; }
 
 .report-card:hover {
     transform: translateX(-5px);
@@ -450,7 +535,6 @@ body {
     gap: 10px;
 }
 
-/* Added Verified Badge */
 .verified-badge {
     background-color: rgba(76, 175, 80, 0.2);
     color: #4CAF50;
@@ -515,9 +599,19 @@ body {
 
 /* Alerts Page */
 .alerts-container {
-    padding: 20px;
+    padding: 40px;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 30px auto;
+
+    /* --- GLASS BOX STYLE --- */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+    /* Animation */
+    animation: fadeInUp 0.8s ease-out;
 }
 
 .alerts-container h1 {
@@ -525,39 +619,42 @@ body {
     margin-bottom: 30px;
     color: #FFD700;
     font-size: 2rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .alert-list {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-height: 200px;
+    justify-content: center;
 }
 
 .alert-card {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     border-left: 5px solid #4CAF50;
+    opacity: 0; /* For animation */
+    animation: slideInRight 0.5s ease-out forwards;
 }
+
+/* Stagger Alert Cards */
+.alert-card:nth-child(1) { animation-delay: 0.1s; }
+.alert-card:nth-child(2) { animation-delay: 0.2s; }
+.alert-card:nth-child(3) { animation-delay: 0.3s; }
 
 .alert-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.alert-card.high {
-    border-left-color: #F44336;
-}
-
-.alert-card.medium {
-    border-left-color: #FF9800;
-}
-
-.alert-card.low {
-    border-left-color: #4CAF50;
-}
+.alert-card.high { border-left-color: #F44336; }
+.alert-card.medium { border-left-color: #FF9800; }
+.alert-card.low { border-left-color: #4CAF50; }
 
 .alert-header {
     display: flex;
@@ -578,17 +675,9 @@ body {
     font-size: 0.9rem;
 }
 
-.alert-card.high .alert-level {
-    background: #F44336;
-}
-
-.alert-card.medium .alert-level {
-    background: #FF9800;
-}
-
-.alert-card.low .alert-level {
-    background: #4CAF50;
-}
+.alert-card.high .alert-level { background: #F44336; }
+.alert-card.medium .alert-level { background: #FF9800; }
+.alert-card.low .alert-level { background: #4CAF50; }
 
 .alert-body p {
     margin-bottom: 15px;
@@ -598,7 +687,7 @@ body {
 .alert-meta {
     display: flex;
     justify-content: space-between;
-    color: #aaa;
+    color: #eee;
     font-size: 0.9rem;
 }
 
@@ -607,6 +696,7 @@ body {
     padding: 20px;
     max-width: 600px;
     margin: 0 auto;
+    animation: fadeInUp 0.8s ease-out;
 }
 
 .help-container h1 {
@@ -621,6 +711,7 @@ body {
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 30px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
 }
 
 .help-info h2 {
@@ -660,7 +751,7 @@ body {
 .contact-card p {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #4CAF50;
+    color: #04f60e;
 }
 
 /* Responsive Design */
@@ -688,7 +779,7 @@ body {
     }
 }
 
-/* Animations */
+/* Legacy Animations */
 @keyframes bounce {
     0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
     40% { transform: translateY(-20px); }
@@ -705,21 +796,9 @@ body {
     text-align: right;
 }
 
-/* User Role Badges */
-.admin-badge {
-    background: linear-gradient(45deg, #F44336, #e91e63);
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.member-badge {
-    background: linear-gradient(45deg, #4CAF50, #8BC34A);
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+/* User Role Badges (Legacy override) */
+.admin-badge, .member-badge {
+    /* Styles handled by #user-role but kept for compatibility */
 }
 
 /* Dashboard Styles */
@@ -741,6 +820,7 @@ body {
     text-align: center;
     margin-bottom: 40px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 1s ease-out;
 }
 
 .hero-content h1 {
@@ -1101,32 +1181,5 @@ body {
     100% {
         transform: translateY(120vh); /* Fall past the bottom */
     }
-}
 
-/* =========================================
-   Lightning Flash Animation Styles
-   ========================================= */
-.lightning-flash {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    opacity: 0;
-    z-index: 50; /* Needs to be visible but not block interactions */
-    pointer-events: none; /* Allows clicking through the flash */
-    transition: opacity 0.1s;
-}
-
-.flash-active {
-    animation: flashAnim 0.2s ease-out;
-}
-
-@keyframes flashAnim {
-    0% { opacity: 0; }
-    10% { opacity: 0.6; } /* Max opacity - bright but not blinding */
-    20% { opacity: 0; }
-    30% { opacity: 0.3; } /* Secondary flicker */
-    100% { opacity: 0; }
 }
