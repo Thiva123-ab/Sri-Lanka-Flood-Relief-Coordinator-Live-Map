@@ -20,29 +20,36 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    // CHANGE: Allow ALL origins (fixes the localhost:63342 issue)
                     config.setAllowedOriginPatterns(List.of("*"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/", "/index.html", "/login.html", "/register.html", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/markers/approved").permitAll() // Public map data
-                        .requestMatchers("/api/alerts").permitAll() // Public alerts
+                        .requestMatchers("/api/markers/approved").permitAll()
+                        .requestMatchers("/api/alerts").permitAll()
 
-                        // Handle OPTIONS requests (pre-flight checks for CORS)
+                        // Allow OPTIONS for CORS
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Admin endpoints
+                        // --- NEW REPORT PERMISSIONS ---
+                        // Members can upload
+                        .requestMatchers("/api/reports/upload").authenticated()
+                        // Only Admins can view the list of reports
+                        .requestMatchers("/api/reports").hasAuthority("ADMIN")
+                        // Admins can download
+                        .requestMatchers("/api/reports/*/download").hasAuthority("ADMIN")
+
+                        // Existing Admin endpoints
                         .requestMatchers("/admin.html").hasAuthority("ADMIN")
                         .requestMatchers("/api/markers/pending", "/api/markers/*/approve", "/api/markers/*/reject").hasAuthority("ADMIN")
 
-                        // Member endpoints
+                        // Existing Member endpoints
                         .requestMatchers("/api/help-requests").authenticated()
                         .requestMatchers("/api/markers/report").authenticated()
 
