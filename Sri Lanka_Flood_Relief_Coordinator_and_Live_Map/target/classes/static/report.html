@@ -6,6 +6,40 @@
   <title>Reports - Flood Relief Sri Lanka</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* Ensure the modal is centered and scrollable on small screens */
+    .modal {
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 80px; /* Extra space for bottom nav */
+    }
+
+    /* Override default display behavior to use Flexbox for centering */
+    .modal[style*="display: block"] {
+      display: flex !important;
+    }
+
+    .modal-content {
+      margin: 0 !important; /* Remove the old top margin */
+      max-height: 80vh;     /* Limit height to 80% of the screen */
+      overflow-y: auto;     /* Enable internal scrolling */
+      width: 90%;
+      max-width: 500px;
+    }
+
+    /* Custom Scrollbar styling for the modal */
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
 
@@ -52,7 +86,7 @@
       <form id="place-form">
         <div class="form-group">
           <label for="place-name">Place Name</label>
-          <input type="text" id="place-name" required>
+          <input type="text" id="place-name" placeholder="E.g., Colombo Fort Station" required>
         </div>
         <div class="form-group">
           <label for="place-type">Type</label>
@@ -66,7 +100,7 @@
         </div>
         <div class="form-group">
           <label for="place-description">Description</label>
-          <textarea id="place-description" rows="3" required></textarea>
+          <textarea id="place-description" rows="3" placeholder="Describe the situation..." required></textarea>
         </div>
         <div class="form-group">
           <label for="place-severity">Severity Level</label>
@@ -77,7 +111,7 @@
             <option value="critical">Critical</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary">Submit for Approval</button>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Submit for Approval</button>
       </form>
     </div>
   </div>

@@ -1,5 +1,4 @@
-// src/main/resources/static/js/report.js
-
+// Report Manager handles the Public Reports Feed
 class ReportManager {
     constructor() {
         this.init();
@@ -13,34 +12,44 @@ class ReportManager {
         const container = document.getElementById('public-reports-list');
         if (!container) return;
 
-        container.innerHTML = '';
+        // Show loading state
+        container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading verified reports...</p>';
 
-        // Fetch approved reports from LocalStorage
-        // (In a full backend integration, this would fetch from /api/markers/approved)
-        const savedApproved = localStorage.getItem('approvedReports');
-        const approved = savedApproved ? JSON.parse(savedApproved) : [];
+        // Connect to Backend: GET /api/markers/approved
+        fetch('/api/markers/approved')
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch');
+                return res.json();
+            })
+            .then(approved => {
+                container.innerHTML = ''; // Clear loading text
 
-        // Update Dashboard Stats
-        this.updateStats(approved);
+                this.updateStats(approved);
 
-        // Handle Empty State
-        if (approved.length === 0) {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #ccc;">
-                    <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <p>No verified incidents reported yet.</p>
-                </div>`;
-            return;
-        }
+                // Handle Empty State
+                if (approved.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #ccc;">
+                            <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p>No verified incidents reported yet.</p>
+                        </div>`;
+                    return;
+                }
 
-        // Sort by newest first
-        approved.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                // Sort by ID (descending) as a proxy for time if timestamp is missing,
+                // or parse timestamp if available
+                approved.sort((a, b) => b.id - a.id);
 
-        // Render Cards
-        approved.forEach(report => {
-            const reportCard = this.createPublicReportCard(report);
-            container.appendChild(reportCard);
-        });
+                // Render Cards
+                approved.forEach(report => {
+                    const reportCard = this.createPublicReportCard(report);
+                    container.appendChild(reportCard);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                container.innerHTML = '<p style="text-align:center; color:#F44336;">Failed to load reports. Please try again later.</p>';
+            });
     }
 
     updateStats(approvedReports) {
@@ -52,14 +61,8 @@ class ReportManager {
         }
 
         if (recentCount) {
-            // Count reports from the last 24 hours
-            const now = new Date();
-            const recent = approvedReports.filter(r => {
-                const date = new Date(r.timestamp);
-                const diff = now - date;
-                return diff < (24 * 60 * 60 * 1000);
-            }).length;
-            recentCount.textContent = recent;
+            // Simply showing total as recent for now, or filter by date if timestamp exists
+            recentCount.textContent = approvedReports.length;
         }
     }
 
@@ -68,10 +71,13 @@ class ReportManager {
         card.className = `report-card ${report.type}`;
 
         // Format date safely
-        const date = new Date(report.timestamp);
-        const dateStr = !isNaN(date)
-            ? date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            : 'Just now';
+        let dateStr = 'Recently';
+        if (report.timestamp) {
+            const date = new Date(report.timestamp);
+            if (!isNaN(date)) {
+                dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+        }
 
         card.innerHTML = `
             <div class="report-header">
@@ -94,7 +100,8 @@ class ReportManager {
     }
 
     getSeverityColor(severity) {
-        switch(severity) {
+        if (!severity) return '#00C851';
+        switch(severity.toLowerCase()) {
             case 'critical': return '#ff4444';
             case 'high': return '#ff8800';
             case 'medium': return '#ffbb33';
