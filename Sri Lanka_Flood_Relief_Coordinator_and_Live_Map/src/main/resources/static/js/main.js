@@ -1,6 +1,5 @@
 // Source: Sri Lanka_Flood_Relief_Coordinator_and_Live_Map/src/main/resources/static/js/main.js
 
-// Main Application Controller
 class FloodReliefApp {
     constructor() {
         this.currentLanguage = 'en';
@@ -10,12 +9,9 @@ class FloodReliefApp {
     }
 
     init() {
-        // Initialize components
         this.setupEventListeners();
 
-        // Load data based on page
         const path = window.location.pathname;
-
         if (path.includes('report.html')) {
             this.loadPublicReports();
         } else if (window.authManager && window.authManager.isAdmin()) {
@@ -24,41 +20,25 @@ class FloodReliefApp {
     }
 
     setupEventListeners() {
-        // FAB button
         const fab = document.getElementById('fab');
-        if (fab) {
-            fab.addEventListener('click', () => this.openPlaceModal());
-        }
+        if (fab) fab.addEventListener('click', () => this.openPlaceModal());
 
-        // Modal close button
         const closeModal = document.querySelector('.modal .close');
-        if (closeModal) {
-            closeModal.addEventListener('click', () => this.closePlaceModal());
-        }
+        if (closeModal) closeModal.addEventListener('click', () => this.closePlaceModal());
 
-        // Close modal when clicking outside
         const modal = document.getElementById('place-modal');
         if (modal) {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.closePlaceModal();
-                }
+                if (e.target === modal) this.closePlaceModal();
             });
         }
 
-        // Place form submission
         const placeForm = document.getElementById('place-form');
-        if (placeForm) {
-            placeForm.addEventListener('submit', (e) => this.handleSubmitPlace(e));
-        }
+        if (placeForm) placeForm.addEventListener('submit', (e) => this.handleSubmitPlace(e));
 
-        // Help form submission
         const helpForm = document.getElementById('help-form');
-        if (helpForm) {
-            helpForm.addEventListener('submit', (e) => this.handleHelpRequest(e));
-        }
+        if (helpForm) helpForm.addEventListener('submit', (e) => this.handleHelpRequest(e));
 
-        // Navigation buttons
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -70,45 +50,40 @@ class FloodReliefApp {
 
     openPlaceModal() {
         const modal = document.getElementById('place-modal');
-        if (modal) {
-            modal.style.display = 'block';
-        }
+        if (modal) modal.style.display = 'block';
     }
 
     closePlaceModal() {
         const modal = document.getElementById('place-modal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-
-        // Reset form
+        if (modal) modal.style.display = 'none';
         const placeForm = document.getElementById('place-form');
-        if (placeForm) {
-            placeForm.reset();
-        }
+        if (placeForm) placeForm.reset();
     }
 
     handleSubmitPlace(e) {
         e.preventDefault();
 
-        // Get form data
+        // Check login first
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            alert("You must be logged in to submit a report.");
+            window.location.href = "login.html";
+            return;
+        }
+
         const placeName = document.getElementById('place-name').value;
         const placeType = document.getElementById('place-type').value;
         const placeDescription = document.getElementById('place-description').value;
         const placeSeverity = document.getElementById('place-severity').value;
 
-        // Base report object
         const report = {
             name: placeName,
             type: placeType,
             description: placeDescription,
             severity: placeSeverity,
             status: 'pending',
-            submittedBy: window.authManager ? window.authManager.getCurrentUser().username : 'Anonymous',
-            // Lat/Lng will be added below
+            submittedBy: window.authManager.getCurrentUser().username,
         };
 
-        // Try to get geolocation
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -117,9 +92,8 @@ class FloodReliefApp {
                     this.sendReportToBackend(report);
                 },
                 (error) => {
-                    console.log("Geolocation error (using default): " + error.message);
-                    // Default fallback (Sri Lanka center)
-                    report.lat = 7.8731;
+                    console.log("Geolocation error: " + error.message);
+                    report.lat = 7.8731; // Default
                     report.lng = 80.7718;
                     this.sendReportToBackend(report);
                 }
@@ -131,26 +105,25 @@ class FloodReliefApp {
         }
     }
 
-    // NEW: Send to Backend instead of Local Storage
+    // FIXED: Added credentials: 'include'
     sendReportToBackend(report) {
         fetch('http://localhost:8080/api/markers/report', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // <--- CRITICAL FIX: Sends the session cookie
             body: JSON.stringify(report)
         })
             .then(response => {
                 if (response.ok) {
                     return response.json();
                 }
-                throw new Error('Failed to submit report');
+                throw new Error('Failed to submit report (Status: ' + response.status + ')');
             })
             .then(data => {
                 alert('Report submitted successfully! Waiting for admin approval.');
                 this.closePlaceModal();
-
-                // If currently on admin view, refresh list
                 if (window.authManager && window.authManager.isAdmin()) {
                     this.loadPendingReports();
                 }
@@ -169,8 +142,7 @@ class FloodReliefApp {
 
         container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading...</p>';
 
-        // FETCH from Backend
-        fetch('http://localhost:8080/api/markers/pending')
+        fetch('http://localhost:8080/api/markers/pending', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 this.pendingReports = data;
@@ -219,13 +191,11 @@ class FloodReliefApp {
 
         container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading verified reports...</p>';
 
-        // FETCH from Backend
         fetch('http://localhost:8080/api/markers/approved')
             .then(res => res.json())
             .then(approved => {
                 this.approvedReports = approved;
                 container.innerHTML = '';
-
                 this.updateStats(approved);
 
                 if (approved.length === 0) {
@@ -233,7 +203,6 @@ class FloodReliefApp {
                     return;
                 }
 
-                // Sort by newest first
                 approved.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
                 approved.forEach(report => {
@@ -251,14 +220,12 @@ class FloodReliefApp {
         const totalCount = document.getElementById('total-reports-count');
         const recentCount = document.getElementById('recent-reports-count');
         if(totalCount) totalCount.textContent = approved.length;
-        if(recentCount) recentCount.textContent = approved.length; // Simplified for now
+        if(recentCount) recentCount.textContent = approved.length;
     }
 
     createPublicReportCard(report) {
         const card = document.createElement('div');
         card.className = `report-card ${report.type}`;
-
-        // Format date
         let dateStr = 'Recently';
         if(report.timestamp) {
             const date = new Date(report.timestamp);
@@ -283,28 +250,22 @@ class FloodReliefApp {
         return card;
     }
 
-    // --- Action Handlers (Connected to Backend) ---
-
     approveReport(reportId) {
-        fetch(`http://localhost:8080/api/markers/${reportId}/approve`, { method: 'PUT' })
+        fetch(`http://localhost:8080/api/markers/${reportId}/approve`, { method: 'PUT', credentials: 'include' })
             .then(res => {
                 if (res.ok) {
                     alert('Report approved!');
-                    this.loadPendingReports(); // Refresh local list
-                    if (window.mapController) {
-                        window.mapController.loadApprovedPlaces();
-                    }
+                    this.loadPendingReports();
+                    if (window.mapController) window.mapController.loadApprovedPlaces();
                 } else {
                     alert('Failed to approve report');
                 }
-            })
-            .catch(err => console.error(err));
+            });
     }
 
     rejectReport(reportId) {
         if (!confirm('Reject this report?')) return;
-
-        fetch(`http://localhost:8080/api/markers/${reportId}/reject`, { method: 'DELETE' })
+        fetch(`http://localhost:8080/api/markers/${reportId}/reject`, { method: 'DELETE', credentials: 'include' })
             .then(res => {
                 if (res.ok) {
                     alert('Report rejected!');
@@ -312,21 +273,14 @@ class FloodReliefApp {
                 } else {
                     alert('Failed to reject report');
                 }
-            })
-            .catch(err => console.error(err));
+            });
     }
 
     switchTab(tabName) {
         switch(tabName) {
-            case 'map':
-                window.location.href = 'map.html';
-                break;
-            case 'reports':
-                window.location.href = 'report.html';
-                break;
-            case 'alerts':
-                window.location.href = 'alerts.html';
-                break;
+            case 'map': window.location.href = 'map.html'; break;
+            case 'reports': window.location.href = 'report.html'; break;
+            case 'alerts': window.location.href = 'alerts.html'; break;
             case 'profile':
                 if (window.authManager && window.authManager.isAdmin()) {
                     window.location.href = 'admin.html';
@@ -339,12 +293,11 @@ class FloodReliefApp {
 
     handleHelpRequest(e) {
         e.preventDefault();
-        alert('Help request submitted successfully! Emergency services will contact you soon.');
+        alert('Help request submitted successfully!');
         e.target.reset();
     }
 }
 
-// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.floodApp = new FloodReliefApp();
 });
