@@ -8,12 +8,11 @@ import java.time.LocalDateTime;
 @Table(name = "map_markers")
 @Data
 public class MapMarker {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type; // "flood", "shelter", "landslide"
+    private String type; // "flood", "safe-zone", etc.
     private double lat;
     private double lng;
     private String name;
@@ -21,14 +20,11 @@ public class MapMarker {
     @Column(length = 1000)
     private String description;
 
-    private String severity; // "low", "medium", "high"
-
-    private String status; // "pending", "approved", "rejected"
-
+    private String severity;
+    private String status; // "pending", "approved"
     private String submittedBy;
     private LocalDateTime timestamp;
 
-    // Optional fields for shelters/supplies
     private Integer capacity;
     private String contact;
 }

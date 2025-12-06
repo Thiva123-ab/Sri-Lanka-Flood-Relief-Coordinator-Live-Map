@@ -22,13 +22,14 @@ public class MapMarkerService {
     }
 
     public MapMarker reportIssue(MapMarker marker) {
-        marker.setStatus("pending"); // Default status
+        marker.setStatus("pending");
         marker.setTimestamp(LocalDateTime.now());
         return mapMarkerRepository.save(marker);
     }
 
     public void approveMarker(Long id) {
-        MapMarker marker = mapMarkerRepository.findById(id).orElseThrow();
+        MapMarker marker = mapMarkerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Marker not found"));
         marker.setStatus("approved");
         mapMarkerRepository.save(marker);
     }

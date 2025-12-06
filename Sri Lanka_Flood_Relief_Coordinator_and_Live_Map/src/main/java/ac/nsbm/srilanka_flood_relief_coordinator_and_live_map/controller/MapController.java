@@ -15,32 +15,27 @@ public class MapController {
     @Autowired
     private MapMarkerService mapMarkerService;
 
-    // Public: Get only approved markers for the live map
     @GetMapping("/approved")
     public List<MapMarker> getPublicMarkers() {
         return mapMarkerService.getApprovedMarkers();
     }
 
-    // Admin: Get pending markers for review
     @GetMapping("/pending")
     public List<MapMarker> getPendingMarkers() {
         return mapMarkerService.getPendingMarkers();
     }
 
-    // Member: Report a new issue
     @PostMapping("/report")
     public MapMarker reportIssue(@RequestBody MapMarker marker) {
         return mapMarkerService.reportIssue(marker);
     }
 
-    // Admin: Approve
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveMarker(@PathVariable Long id) {
         mapMarkerService.approveMarker(id);
         return ResponseEntity.ok("Marker Approved");
     }
 
-    // Admin: Reject
     @DeleteMapping("/{id}/reject")
     public ResponseEntity<?> rejectMarker(@PathVariable Long id) {
         mapMarkerService.rejectMarker(id);

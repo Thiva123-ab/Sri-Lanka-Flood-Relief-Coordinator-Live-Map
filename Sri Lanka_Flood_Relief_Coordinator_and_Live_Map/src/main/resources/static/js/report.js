@@ -15,8 +15,8 @@ class ReportManager {
         // Show loading state
         container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading verified reports...</p>';
 
-        // Connect to Backend: GET /api/markers/approved
-        fetch('/api/markers/approved')
+        // FIXED: Use full URL to localhost:8080
+        fetch('http://localhost:8080/api/markers/approved')
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch');
                 return res.json();

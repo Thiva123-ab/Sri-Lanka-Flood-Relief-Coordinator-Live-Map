@@ -8,20 +8,16 @@ import java.time.LocalDateTime;
 @Table(name = "reports")
 @Data
 public class Report {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-
     @Column(length = 1000)
     private String description;
-
     private String submittedBy;
     private LocalDateTime timestamp;
 
-    // File Metadata & Content
     private String fileName;
     private String fileType;
 

@@ -18,7 +18,6 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    // Upload a new report (Member/Admin)
     @PostMapping("/upload")
     public ResponseEntity<?> uploadReport(@RequestParam("file") MultipartFile file,
                                           @RequestParam("title") String title,
@@ -32,13 +31,11 @@ public class ReportController {
         }
     }
 
-    // Get all reports (Admin only - see SecurityConfig)
     @GetMapping
     public List<Report> getAllReports() {
         return reportService.getAllReports();
     }
 
-    // Download a specific file
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadReportFile(@PathVariable Long id) {
         Report report = reportService.getReport(id);

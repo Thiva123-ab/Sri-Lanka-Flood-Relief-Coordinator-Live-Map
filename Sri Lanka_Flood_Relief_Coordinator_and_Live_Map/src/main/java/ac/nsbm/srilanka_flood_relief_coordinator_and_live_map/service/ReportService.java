@@ -23,10 +23,11 @@ public class ReportService {
         report.setSubmittedBy(username);
         report.setTimestamp(LocalDateTime.now());
 
-        // Handle File
-        report.setFileName(file.getOriginalFilename());
-        report.setFileType(file.getContentType());
-        report.setData(file.getBytes());
+        if (file != null && !file.isEmpty()) {
+            report.setFileName(file.getOriginalFilename());
+            report.setFileType(file.getContentType());
+            report.setData(file.getBytes());
+        }
 
         return reportRepository.save(report);
     }

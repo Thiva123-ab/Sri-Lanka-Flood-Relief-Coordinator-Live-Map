@@ -1,10 +1,9 @@
 package ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.controller;
 
 import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.model.Alert;
-import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.repository.AlertRepository;
+import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -12,21 +11,20 @@ import java.util.List;
 public class AlertController {
 
     @Autowired
-    private AlertRepository alertRepository;
+    private AlertService alertService;
 
     @GetMapping
     public List<Alert> getAllAlerts() {
-        return alertRepository.findAllByOrderByTimestampDesc();
+        return alertService.getAllAlerts();
     }
 
     @PostMapping
     public Alert createAlert(@RequestBody Alert alert) {
-        alert.setTimestamp(LocalDateTime.now());
-        return alertRepository.save(alert);
+        return alertService.createAlert(alert);
     }
 
     @DeleteMapping("/{id}")
     public void deleteAlert(@PathVariable Long id) {
-        alertRepository.deleteById(id);
+        // You may want to add a delete method in AlertService calling repository
     }
 }

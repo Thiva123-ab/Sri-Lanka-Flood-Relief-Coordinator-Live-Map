@@ -12,8 +12,6 @@ class FloodReliefApp {
     init() {
         // Initialize components
         this.setupEventListeners();
-        this.loadSampleData();
-        // this.updateLanguage(); // Removed language logic
 
         // Load data based on page
         const path = window.location.pathname;
@@ -64,7 +62,8 @@ class FloodReliefApp {
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.switchTab(e.target.closest('.nav-btn').dataset.tab);
+                const tab = e.currentTarget.dataset.tab;
+                this.switchTab(tab);
             });
         });
     }
@@ -100,14 +99,13 @@ class FloodReliefApp {
 
         // Base report object
         const report = {
-            id: Date.now(),
             name: placeName,
             type: placeType,
             description: placeDescription,
             severity: placeSeverity,
             status: 'pending',
             submittedBy: window.authManager ? window.authManager.getCurrentUser().username : 'Anonymous',
-            timestamp: new Date().toISOString()
+            // Lat/Lng will be added below
         };
 
         // Try to get geolocation
@@ -116,33 +114,51 @@ class FloodReliefApp {
                 (position) => {
                     report.lat = position.coords.latitude;
                     report.lng = position.coords.longitude;
-                    this.saveAndCompleteReport(report);
+                    this.sendReportToBackend(report);
                 },
                 (error) => {
-                    console.log("Geolocation error (using random fallback in MapController): " + error.message);
-                    this.saveAndCompleteReport(report);
+                    console.log("Geolocation error (using default): " + error.message);
+                    // Default fallback (Sri Lanka center)
+                    report.lat = 7.8731;
+                    report.lng = 80.7718;
+                    this.sendReportToBackend(report);
                 }
             );
         } else {
-            this.saveAndCompleteReport(report);
+            report.lat = 7.8731;
+            report.lng = 80.7718;
+            this.sendReportToBackend(report);
         }
     }
 
-    saveAndCompleteReport(report) {
-        // Save to pending reports
-        this.pendingReports.push(report);
-        this.saveReports();
+    // NEW: Send to Backend instead of Local Storage
+    sendReportToBackend(report) {
+        fetch('http://localhost:8080/api/markers/report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(report)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to submit report');
+            })
+            .then(data => {
+                alert('Report submitted successfully! Waiting for admin approval.');
+                this.closePlaceModal();
 
-        // Close modal
-        this.closePlaceModal();
-
-        // Show confirmation
-        alert('Report submitted successfully! Waiting for admin approval.');
-
-        // If admin, reload pending reports
-        if (window.authManager && window.authManager.isAdmin()) {
-            this.loadPendingReports();
-        }
+                // If currently on admin view, refresh list
+                if (window.authManager && window.authManager.isAdmin()) {
+                    this.loadPendingReports();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting report. Please check backend connection.');
+            });
     }
 
     // --- Admin/Pending Report Logic ---
@@ -151,20 +167,29 @@ class FloodReliefApp {
         const container = document.getElementById('pending-reports');
         if (!container) return;
 
-        container.innerHTML = '';
+        container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading...</p>';
 
-        // Filter pending reports
-        const pending = this.pendingReports.filter(report => report.status === 'pending');
+        // FETCH from Backend
+        fetch('http://localhost:8080/api/markers/pending')
+            .then(res => res.json())
+            .then(data => {
+                this.pendingReports = data;
+                container.innerHTML = '';
 
-        if (pending.length === 0) {
-            container.innerHTML = '<p>No pending reports</p>';
-            return;
-        }
+                if (this.pendingReports.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color:#ccc;">No pending reports</p>';
+                    return;
+                }
 
-        pending.forEach(report => {
-            const reportCard = this.createReportCard(report);
-            container.appendChild(reportCard);
-        });
+                this.pendingReports.forEach(report => {
+                    const reportCard = this.createReportCard(report);
+                    container.appendChild(reportCard);
+                });
+            })
+            .catch(err => {
+                console.error("Error loading pending reports:", err);
+                container.innerHTML = '<p style="color:red; text-align:center;">Failed to load reports</p>';
+            });
     }
 
     createReportCard(report) {
@@ -179,8 +204,8 @@ class FloodReliefApp {
             <div class="report-severity">Severity: ${report.severity}</div>
             <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
             <div class="report-actions">
-                <button class="btn-approve" onclick="approveReport(${report.id})">Approve</button>
-                <button class="btn-reject" onclick="rejectReport(${report.id})">Reject</button>
+                <button class="btn-approve" onclick="window.floodApp.approveReport(${report.id})">Approve</button>
+                <button class="btn-reject" onclick="window.floodApp.rejectReport(${report.id})">Reject</button>
             </div>
         `;
         return card;
@@ -192,36 +217,41 @@ class FloodReliefApp {
         const container = document.getElementById('public-reports-list');
         if (!container) return;
 
-        container.innerHTML = '';
+        container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading verified reports...</p>';
 
-        // Filter approved reports
-        // In a real app, this would be a server fetch
-        const savedApproved = localStorage.getItem('approvedReports');
-        const approved = savedApproved ? JSON.parse(savedApproved) : [];
+        // FETCH from Backend
+        fetch('http://localhost:8080/api/markers/approved')
+            .then(res => res.json())
+            .then(approved => {
+                this.approvedReports = approved;
+                container.innerHTML = '';
 
-        // Update stats
+                this.updateStats(approved);
+
+                if (approved.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #ccc; margin-top: 20px;">No verified incidents reported yet.</p>';
+                    return;
+                }
+
+                // Sort by newest first
+                approved.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                approved.forEach(report => {
+                    const reportCard = this.createPublicReportCard(report);
+                    container.appendChild(reportCard);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                container.innerHTML = '<p style="text-align:center; color:#F44336;">Failed to load reports.</p>';
+            });
+    }
+
+    updateStats(approved) {
         const totalCount = document.getElementById('total-reports-count');
         const recentCount = document.getElementById('recent-reports-count');
-        if (totalCount) totalCount.textContent = approved.length;
-        if (recentCount) recentCount.textContent = approved.filter(r => {
-            const date = new Date(r.timestamp);
-            const now = new Date();
-            const diff = now - date;
-            return diff < (24 * 60 * 60 * 1000); // Last 24 hours
-        }).length;
-
-        if (approved.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #ccc; margin-top: 20px;">No verified incidents reported yet.</p>';
-            return;
-        }
-
-        // Sort by newest first
-        approved.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-        approved.forEach(report => {
-            const reportCard = this.createPublicReportCard(report);
-            container.appendChild(reportCard);
-        });
+        if(totalCount) totalCount.textContent = approved.length;
+        if(recentCount) recentCount.textContent = approved.length; // Simplified for now
     }
 
     createPublicReportCard(report) {
@@ -229,8 +259,11 @@ class FloodReliefApp {
         card.className = `report-card ${report.type}`;
 
         // Format date
-        const date = new Date(report.timestamp);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        let dateStr = 'Recently';
+        if(report.timestamp) {
+            const date = new Date(report.timestamp);
+            dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
 
         card.innerHTML = `
             <div class="report-header">
@@ -250,117 +283,55 @@ class FloodReliefApp {
         return card;
     }
 
-    // --- Action Handlers ---
+    // --- Action Handlers (Connected to Backend) ---
 
     approveReport(reportId) {
-        const report = this.pendingReports.find(r => r.id == reportId);
-        if (report) {
-            report.status = 'approved';
-            this.approvedReports.push(report);
-            this.saveReports();
-            this.loadPendingReports();
-
-            // Add to map
-            if (window.mapController) {
-                window.mapController.addApprovedPlace(report);
-            }
-
-            alert('Report approved and added to map!');
-        }
+        fetch(`http://localhost:8080/api/markers/${reportId}/approve`, { method: 'PUT' })
+            .then(res => {
+                if (res.ok) {
+                    alert('Report approved!');
+                    this.loadPendingReports(); // Refresh local list
+                    if (window.mapController) {
+                        window.mapController.loadApprovedPlaces();
+                    }
+                } else {
+                    alert('Failed to approve report');
+                }
+            })
+            .catch(err => console.error(err));
     }
 
     rejectReport(reportId) {
-        const reportIndex = this.pendingReports.findIndex(r => r.id == reportId);
-        if (reportIndex !== -1) {
-            this.pendingReports.splice(reportIndex, 1);
-            this.saveReports();
-            this.loadPendingReports();
-            alert('Report rejected!');
-        }
-    }
+        if (!confirm('Reject this report?')) return;
 
-    saveReports() {
-        localStorage.setItem('pendingReports', JSON.stringify(this.pendingReports));
-        localStorage.setItem('approvedReports', JSON.stringify(this.approvedReports));
-    }
-
-    loadSampleData() {
-        // Load from localStorage or initialize with sample data
-        const savedPending = localStorage.getItem('pendingReports');
-        const savedApproved = localStorage.getItem('approvedReports');
-
-        if (savedPending) {
-            this.pendingReports = JSON.parse(savedPending);
-        } else {
-            // Sample pending reports
-            this.pendingReports = [
-                {
-                    id: 1,
-                    name: "Colombo Main Street",
-                    type: "flood",
-                    description: "Severe flooding after heavy rains",
-                    severity: "high",
-                    status: "pending",
-                    submittedBy: "user1",
-                    timestamp: "2023-06-15T10:30:00Z"
+        fetch(`http://localhost:8080/api/markers/${reportId}/reject`, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) {
+                    alert('Report rejected!');
+                    this.loadPendingReports();
+                } else {
+                    alert('Failed to reject report');
                 }
-            ];
-        }
-
-        if (savedApproved) {
-            this.approvedReports = JSON.parse(savedApproved);
-        } else {
-            // Sample approved reports
-            this.approvedReports = [
-                {
-                    id: 3,
-                    name: "Galle Safe Zone",
-                    type: "safe-zone",
-                    description: "Community center available for shelter",
-                    severity: "low",
-                    status: "approved",
-                    submittedBy: "admin",
-                    timestamp: "2023-06-14T09:15:00Z"
-                }
-            ];
-        }
+            })
+            .catch(err => console.error(err));
     }
 
     switchTab(tabName) {
-        // Update active nav button (UI only)
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const activeBtn = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
-
-        // Navigate to the appropriate page
         switch(tabName) {
             case 'map':
-                if (!window.location.pathname.includes('map.html')) {
-                    window.location.href = 'map.html';
-                }
+                window.location.href = 'map.html';
                 break;
             case 'reports':
-                if (!window.location.pathname.includes('report.html')) {
-                    window.location.href = 'report.html';
-                }
+                window.location.href = 'report.html';
                 break;
             case 'alerts':
-                if (!window.location.pathname.includes('alerts.html')) {
-                    window.location.href = 'alerts.html';
-                }
+                window.location.href = 'alerts.html';
                 break;
             case 'profile':
-                // Check if user is admin
                 if (window.authManager && window.authManager.isAdmin()) {
-                    if (!window.location.pathname.includes('admin.html')) {
-                        window.location.href = 'admin.html';
-                    }
+                    window.location.href = 'admin.html';
                 } else {
-                    if (!window.location.pathname.includes('help.html')) {
-                        window.location.href = 'help.html';
-                    }
+                    window.location.href = 'help.html';
                 }
                 break;
         }
@@ -368,8 +339,6 @@ class FloodReliefApp {
 
     handleHelpRequest(e) {
         e.preventDefault();
-        const name = document.getElementById('help-name').value;
-        console.log('Help request submitted:', { name });
         alert('Help request submitted successfully! Emergency services will contact you soon.');
         e.target.reset();
     }
@@ -378,13 +347,4 @@ class FloodReliefApp {
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.floodApp = new FloodReliefApp();
-
-    // Make approve/reject functions globally accessible
-    window.approveReport = (id) => {
-        window.floodApp.approveReport(id);
-    };
-
-    window.rejectReport = (id) => {
-        window.floodApp.rejectReport(id);
-    };
 });

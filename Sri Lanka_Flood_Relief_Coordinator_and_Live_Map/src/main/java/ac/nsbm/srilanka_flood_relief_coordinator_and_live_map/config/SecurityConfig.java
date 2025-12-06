@@ -1,12 +1,16 @@
 package ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.config;
 
+import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -14,6 +18,12 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final CustomUserDetailsService userDetailsService;
+
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,41 +37,50 @@ public class SecurityConfig {
                     return config;
                 }))
                 .csrf(csrf -> csrf.disable())
+                .securityContext(context -> context
+                        .securityContextRepository(new HttpSessionSecurityContextRepository())
+                )
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/", "/index.html", "/login.html", "/register.html", "/css/**", "/js/**", "/images/**").permitAll()
+                        // Public Endpoints
+                        .requestMatchers("/", "/index.html", "/login.html", "/register.html",
+                                "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/markers/approved").permitAll()
                         .requestMatchers("/api/alerts").permitAll()
-
-                        // Allow OPTIONS for CORS
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // --- NEW REPORT PERMISSIONS ---
-                        // Members can upload
+                        // Admin Only
+                        .requestMatchers("/admin.html").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                        .requestMatchers("/api/reports").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                        .requestMatchers("/api/markers/pending", "/api/markers/*/approve",
+                                "/api/markers/*/reject").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+
+                        // Member/Authenticated Endpoints
                         .requestMatchers("/api/reports/upload").authenticated()
-                        // Only Admins can view the list of reports
-                        .requestMatchers("/api/reports").hasAuthority("ADMIN")
-                        // Admins can download
-                        .requestMatchers("/api/reports/*/download").hasAuthority("ADMIN")
-
-                        // Existing Admin endpoints
-                        .requestMatchers("/admin.html").hasAuthority("ADMIN")
-                        .requestMatchers("/api/markers/pending", "/api/markers/*/approve", "/api/markers/*/reject").hasAuthority("ADMIN")
-
-                        // Existing Member endpoints
                         .requestMatchers("/api/help-requests").authenticated()
                         .requestMatchers("/api/markers/report").authenticated()
 
                         .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> {});
+                // ❌ REMOVED: .authenticationProvider(authenticationProvider()) - causes recursion [web:23]
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((req, res, auth) -> res.setStatus(200))
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                );
 
         return http.build();
     }
 
+    // ✅ KEEP these beans - Spring auto-detects CustomUserDetailsService [web:15]
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

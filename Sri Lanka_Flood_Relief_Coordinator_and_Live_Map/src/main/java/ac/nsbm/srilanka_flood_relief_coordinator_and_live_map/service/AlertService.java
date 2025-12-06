@@ -18,7 +18,6 @@ public class AlertService {
     }
 
     public Alert createAlert(Alert alert) {
-        // Business Logic: If no timestamp is provided, set it to "now"
         if (alert.getTimestamp() == null) {
             alert.setTimestamp(LocalDateTime.now());
         }
