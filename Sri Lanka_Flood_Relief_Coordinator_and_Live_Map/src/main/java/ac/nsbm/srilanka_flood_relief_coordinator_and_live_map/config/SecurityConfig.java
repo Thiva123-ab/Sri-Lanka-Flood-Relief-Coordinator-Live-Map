@@ -49,20 +49,21 @@ public class SecurityConfig {
                         .requestMatchers("/api/alerts").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Admin Only
+                        // Admin Only Actions (Approve/Reject must remain restricted)
                         .requestMatchers("/admin.html").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
                         .requestMatchers("/api/reports").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
-                        .requestMatchers("/api/markers/pending", "/api/markers/*/approve",
+                        .requestMatchers("/api/markers/*/approve",
                                 "/api/markers/*/reject").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
-                        // Member/Authenticated Endpoints
+                        // Authenticated Endpoints (Members & Admins)
+                        // UPDATED: 'pending' moved here so logged-in members can fetch their own reports
+                        .requestMatchers("/api/markers/pending").authenticated()
                         .requestMatchers("/api/reports/upload").authenticated()
                         .requestMatchers("/api/help-requests").authenticated()
                         .requestMatchers("/api/markers/report").authenticated()
 
                         .anyRequest().authenticated()
                 )
-                // ❌ REMOVED: .authenticationProvider(authenticationProvider()) - causes recursion [web:23]
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((req, res, auth) -> res.setStatus(200))
@@ -73,7 +74,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ KEEP these beans - Spring auto-detects CustomUserDetailsService [web:15]
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

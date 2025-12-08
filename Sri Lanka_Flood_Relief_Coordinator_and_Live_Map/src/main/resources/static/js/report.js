@@ -13,35 +13,71 @@ class ReportManager {
         if (!container) return;
 
         // Show loading state
-        container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading verified reports...</p>';
+        container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading reports...</p>';
 
-        // FIXED: Use full URL to localhost:8080
-        fetch('http://localhost:8080/api/markers/approved')
+        // 1. Fetch Approved Reports (Public)
+        const fetchApproved = fetch('http://localhost:8080/api/markers/approved')
+            .then(res => res.json())
+            .catch(err => {
+                console.error("Failed to load approved:", err);
+                return [];
+            });
+
+        // 2. Fetch Pending Reports (Authenticated only) - with credentials
+        const fetchPending = fetch('http://localhost:8080/api/markers/pending', { credentials: 'include' })
             .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch');
-                return res.json();
+                if (res.ok) return res.json();
+                return []; // Return empty array if not logged in (401/403)
             })
-            .then(approved => {
+            .catch(err => {
+                // It's okay if this fails for guests
+                return [];
+            });
+
+        // 3. Process Both Lists
+        Promise.all([fetchApproved, fetchPending])
+            .then(([approved, pending]) => {
                 container.innerHTML = ''; // Clear loading text
 
-                this.updateStats(approved);
+                // Get Current User
+                let currentUser = null;
+                const userJson = localStorage.getItem('floodReliefUser');
+                if (userJson) {
+                    currentUser = JSON.parse(userJson);
+                }
+
+                // Filter Pending Reports
+                let myPending = [];
+                if (currentUser) {
+                    if (currentUser.role === 'ADMIN' || currentUser.role === 'ROLE_ADMIN') {
+                        // Admins see all pending
+                        myPending = pending;
+                    } else {
+                        // Members only see THEIR OWN pending reports
+                        myPending = pending.filter(p => p.submittedBy === currentUser.username);
+                    }
+                }
+
+                // Combine Approved + My Pending
+                const allReports = [...myPending, ...approved];
+
+                this.updateStats(approved, myPending);
 
                 // Handle Empty State
-                if (approved.length === 0) {
+                if (allReports.length === 0) {
                     container.innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: #ccc;">
-                            <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                            <p>No verified incidents reported yet.</p>
-                        </div>`;
+                    <div style="text-align: center; padding: 40px; color: #ccc;">
+                        <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>No verified incidents or pending reports found.</p>
+                    </div>`;
                     return;
                 }
 
-                // Sort by ID (descending) as a proxy for time if timestamp is missing,
-                // or parse timestamp if available
-                approved.sort((a, b) => b.id - a.id);
+                // Sort by ID (descending) so newest (pending or approved) are at top
+                allReports.sort((a, b) => b.id - a.id);
 
                 // Render Cards
-                approved.forEach(report => {
+                allReports.forEach(report => {
                     const reportCard = this.createPublicReportCard(report);
                     container.appendChild(reportCard);
                 });
@@ -52,17 +88,18 @@ class ReportManager {
             });
     }
 
-    updateStats(approvedReports) {
+    updateStats(approvedReports, pendingReports) {
         const totalCount = document.getElementById('total-reports-count');
         const recentCount = document.getElementById('recent-reports-count');
 
         if (totalCount) {
+            // Show total verified
             totalCount.textContent = approvedReports.length;
         }
 
         if (recentCount) {
-            // Simply showing total as recent for now, or filter by date if timestamp exists
-            recentCount.textContent = approvedReports.length;
+            // Show recent activity (Verified + My Pending)
+            recentCount.textContent = approvedReports.length + pendingReports.length;
         }
     }
 
@@ -79,19 +116,21 @@ class ReportManager {
             }
         }
 
-        // --- NEW STATUS BADGE LOGIC ---
-        // Defaults to 'APPROVED' if status is missing (since we fetched from /approved)
-        // But handles 'PENDING' or 'REJECTED' if data source changes.
+        // --- STATUS BADGE LOGIC ---
+        // Defaults to 'APPROVED' if status is missing
         const status = report.status ? report.status.toUpperCase() : 'APPROVED';
 
         let statusColor = '#00C851'; // Default Green (Approved)
         let statusIcon = 'check-circle';
+        let borderColor = '#00C851';
 
         if (status === 'PENDING') {
             statusColor = '#FF9800'; // Orange
+            borderColor = '#FF9800';
             statusIcon = 'clock';
         } else if (status === 'REJECTED') {
             statusColor = '#ff4444'; // Red
+            borderColor = '#ff4444';
             statusIcon = 'times-circle';
         }
 
@@ -99,7 +138,7 @@ class ReportManager {
         const statusBadge = `
             <span style="background-color: ${statusColor}20; 
                          color: ${statusColor}; 
-                         border: 1px solid ${statusColor}; 
+                         border: 1px solid ${borderColor}; 
                          font-size: 0.65rem; 
                          padding: 2px 8px; 
                          border-radius: 12px; 
@@ -107,7 +146,8 @@ class ReportManager {
                          align-items: center; 
                          gap: 4px; 
                          margin-left: 10px; 
-                         vertical-align: middle;">
+                         vertical-align: middle;
+                         text-transform: uppercase;">
                 <i class="fas fa-${statusIcon}"></i> ${status}
             </span>
         `;

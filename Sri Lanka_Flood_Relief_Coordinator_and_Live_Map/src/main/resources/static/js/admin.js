@@ -330,7 +330,7 @@ class AdminManager {
             if (req.needs && req.needs.length > 0) {
                 needsHtml = `<div style="margin-top:5px; font-weight:bold; color:#FFD700;">Needs: ${Array.isArray(req.needs) ? req.needs.join(', ') : req.needs}</div>`;
             }
-            // ADDED: Status badge for Help Requests
+
             card.innerHTML = `
                 <div class="report-header">
                     <div class="report-title"><i class="fas fa-hands-helping"></i> ${req.name}</div>
@@ -366,9 +366,44 @@ class AdminManager {
             const card = document.createElement('div');
             card.className = `report-card ${report.type}`;
 
-            // ADDED: Status Badge Logic
+            // Status Badge
             const status = report.status ? report.status.toUpperCase() : 'PENDING';
-            const statusColor = status === 'APPROVED' ? '#4CAF50' : '#FF9800'; // Green or Orange
+            const statusColor = status === 'APPROVED' ? '#4CAF50' : '#FF9800';
+
+            // --- MODERN BUTTON STYLES INJECTED HERE ---
+            const btnApproveStyle = `
+                flex: 1;
+                background: linear-gradient(135deg, #28a745, #218838);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-weight: 600;
+                transition: transform 0.2s, box-shadow 0.2s;
+                box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
+            `;
+
+            const btnRejectStyle = `
+                flex: 1;
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-weight: 600;
+                transition: transform 0.2s, box-shadow 0.2s;
+                box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
+            `;
 
             card.innerHTML = `
                 <div class="report-header">
@@ -384,9 +419,19 @@ class AdminManager {
                 <div class="report-severity">Severity: <strong>${report.severity}</strong></div>
                 <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
                 
-                <div class="report-actions">
-                    <button class="btn-approve" onclick="window.adminManager.approveReport(${report.id})">Approve</button>
-                    <button class="btn-reject" onclick="window.adminManager.rejectReport(${report.id})">Reject</button>
+                <div class="report-actions" style="margin-top: 15px; display: flex; gap: 15px;">
+                    <button style="${btnApproveStyle}" 
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(40, 167, 69, 0.4)'" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(40, 167, 69, 0.3)'"
+                            onclick="window.adminManager.approveReport(${report.id})">
+                        <i class="fas fa-check"></i> Accept
+                    </button>
+                    <button style="${btnRejectStyle}" 
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(220, 53, 69, 0.4)'" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(220, 53, 69, 0.3)'"
+                            onclick="window.adminManager.rejectReport(${report.id})">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
                 </div>
             `;
             container.appendChild(card);

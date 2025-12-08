@@ -6,6 +6,8 @@ class AdminManager {
         this.approvedReports = [];
         this.alerts = [];
         this.helpRequests = [];
+        this.incidentChart = null;
+        this.needsChart = null;
         this.init();
     }
 
@@ -16,9 +18,7 @@ class AdminManager {
             return;
         }
 
-        this.loadReports();
-        this.loadAlerts();
-        this.loadHelpRequests(); // New Function Call
+        this.loadAllData();
         this.setupEventListeners();
     }
 
@@ -32,7 +32,10 @@ class AdminManager {
         const closeModal = document.querySelector('#alert-modal .close');
         if (closeModal) closeModal.addEventListener('click', () => this.closeAlertModal());
 
-        // Add navigation listeners if missing
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        if (downloadPdfBtn) downloadPdfBtn.addEventListener('click', () => this.generatePDF());
+
+        // Add navigation listeners
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -53,55 +56,204 @@ class AdminManager {
 
     // --- API CONNECTIONS ---
 
-    loadHelpRequests() {
-        fetch('http://localhost:8080/api/help-requests', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                this.helpRequests = data;
-                this.renderHelpRequests();
-            })
-            .catch(err => console.error("Error loading help requests:", err));
+    async loadAllData() {
+        try {
+            // 1. Fetch Help Requests
+            const helpRes = await fetch('http://localhost:8080/api/help-requests', { credentials: 'include' });
+            this.helpRequests = await helpRes.json();
+            this.renderHelpRequests();
+
+            // 2. Fetch Pending Reports
+            const pendingRes = await fetch('http://localhost:8080/api/markers/pending', { credentials: 'include' });
+            this.pendingReports = await pendingRes.json();
+            this.renderPendingReports();
+
+            // 3. Fetch Approved Reports (For Analytics)
+            const approvedRes = await fetch('http://localhost:8080/api/markers/approved', { credentials: 'include' });
+            this.approvedReports = await approvedRes.json();
+
+            // 4. Fetch Alerts
+            const alertsRes = await fetch('http://localhost:8080/api/alerts', { credentials: 'include' });
+            this.alerts = await alertsRes.json();
+            this.renderAlerts();
+
+            // Update Dashboard UI
+            this.updateStats();
+            this.renderCharts();
+
+        } catch (err) {
+            console.error("Error loading dashboard data:", err);
+        }
     }
 
-    loadReports() {
-        // 1. Fetch Pending Reports (Correct Endpoint)
-        fetch('http://localhost:8080/api/markers/pending', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                this.pendingReports = data;
-                this.updateStats(); // Update the dashboard counters
-                this.renderPendingReports(); // Show list
-            })
-            .catch(err => console.error("Error loading pending reports:", err));
+    // --- ANALYTICS & CHARTS ---
 
-        // 2. Fetch Approved Reports (Correct Endpoint)
-        fetch('http://localhost:8080/api/markers/approved', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                this.approvedReports = data;
-                this.updateStats(); // Update the dashboard counters
-            })
-            .catch(err => console.error("Error loading approved reports:", err));
+    updateStats() {
+        const totalIncidents = this.approvedReports.length;
+        const totalRequests = this.helpRequests.length;
+        const highRisk = this.approvedReports.filter(i =>
+            i.severity && (i.severity.toLowerCase() === 'critical' || i.severity.toLowerCase() === 'high')
+        ).length;
+
+        const pendingCount = document.getElementById('pending-count');
+        if (pendingCount) pendingCount.textContent = this.pendingReports.length;
+
+        const approvedCount = document.getElementById('approved-count');
+        if (approvedCount) approvedCount.textContent = this.approvedReports.length;
+
+        const alertsCount = document.getElementById('alerts-count');
+        if (alertsCount) alertsCount.textContent = this.alerts.length;
+
+        // Also update dashboard summary cards if they exist
+        const dashTotal = document.getElementById('total-incidents');
+        if(dashTotal) dashTotal.textContent = totalIncidents;
+
+        const dashRequests = document.getElementById('total-requests');
+        if(dashRequests) dashRequests.textContent = totalRequests;
+
+        const dashHighRisk = document.getElementById('high-risk-count');
+        if(dashHighRisk) dashHighRisk.textContent = highRisk;
     }
 
-    loadAlerts() {
-        // Fetch Alerts from Backend
-        fetch('http://localhost:8080/api/alerts', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                this.alerts = data;
-                this.updateStats();
-                this.renderAlerts();
-            })
-            .catch(err => console.error("Error loading alerts:", err));
+    renderCharts() {
+        // Destroy existing charts if refreshing
+        if (this.incidentChart) this.incidentChart.destroy();
+        if (this.needsChart) this.needsChart.destroy();
+
+        const incidentCanvas = document.getElementById('incidentChart');
+        const needsCanvas = document.getElementById('needsChart');
+
+        if (!incidentCanvas || !needsCanvas) return;
+
+        // 1. Incident Type Chart (Doughnut)
+        const typeCounts = {};
+        this.approvedReports.forEach(i => {
+            const type = i.type || 'Other';
+            typeCounts[type] = (typeCounts[type] || 0) + 1;
+        });
+
+        this.incidentChart = new Chart(incidentCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(typeCounts).map(s => s.toUpperCase().replace('-', ' ')),
+                datasets: [{
+                    data: Object.values(typeCounts),
+                    backgroundColor: ['#2196F3', '#FF9800', '#9E9E9E', '#4CAF50', '#F44336'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#fff' } }
+                }
+            }
+        });
+
+        // 2. Help Needs Chart (Bar)
+        const needCounts = {};
+        this.helpRequests.forEach(req => {
+            if (req.needs && Array.isArray(req.needs)) {
+                req.needs.forEach(need => {
+                    needCounts[need] = (needCounts[need] || 0) + 1;
+                });
+            } else {
+                const need = req.needs || "General";
+                needCounts[need] = (needCounts[need] || 0) + 1;
+            }
+        });
+
+        this.needsChart = new Chart(needsCanvas, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(needCounts),
+                datasets: [{
+                    label: 'Requests',
+                    data: Object.values(needCounts),
+                    backgroundColor: '#FFD700',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { ticks: { color: '#fff' }, grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
     }
+
+    generatePDF() {
+        if (!window.jspdf) return;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Flood Relief Sri Lanka - Situation Report", 14, 20);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+
+        // Stats Summary Box
+        doc.setFillColor(240, 240, 240);
+        doc.rect(14, 35, 180, 20, 'F');
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(`Total Incidents: ${this.approvedReports.length}`, 20, 48);
+        doc.text(`Active Help Requests: ${this.helpRequests.length}`, 80, 48);
+
+        // Help Requests Table
+        doc.setFontSize(14);
+        doc.setTextColor(41, 128, 185);
+        doc.text("Emergency Help Requests", 14, 70);
+
+        const reqRows = this.helpRequests.map(r => [
+            r.name, r.phone, Array.isArray(r.needs) ? r.needs.join(", ") : r.needs, r.details
+        ]);
+
+        doc.autoTable({
+            startY: 75,
+            head: [['Name', 'Phone', 'Needs', 'Details']],
+            body: reqRows,
+            theme: 'grid',
+            headStyles: { fillColor: [244, 67, 54] }
+        });
+
+        // Incidents Table
+        let finalY = doc.lastAutoTable.finalY + 15;
+        if (finalY > 250) { doc.addPage(); finalY = 20; }
+
+        doc.text("Verified Incidents", 14, finalY);
+        const incRows = this.approvedReports.map(i => [
+            i.name, i.type, i.severity || 'N/A', i.description
+        ]);
+
+        doc.autoTable({
+            startY: finalY + 5,
+            head: [['Location', 'Type', 'Severity', 'Description']],
+            body: incRows,
+            theme: 'striped',
+            headStyles: { fillColor: [76, 175, 80] }
+        });
+
+        doc.save("Flood_Situation_Report.pdf");
+    }
+
+    // --- MANAGEMENT FUNCTIONS ---
 
     approveReport(id) {
         fetch(`http://localhost:8080/api/markers/${id}/approve`, { method: 'PUT', credentials: 'include' })
             .then(res => {
                 if (res.ok) {
                     alert('Report Approved!');
-                    this.loadReports(); // Refresh lists
+                    this.loadAllData();
                 } else {
                     alert('Failed to approve report');
                 }
@@ -114,7 +266,7 @@ class AdminManager {
             .then(res => {
                 if (res.ok) {
                     alert('Report Rejected');
-                    this.loadReports(); // Refresh lists
+                    this.loadAllData();
                 } else {
                     alert('Failed to reject report');
                 }
@@ -126,14 +278,13 @@ class AdminManager {
         fetch(`http://localhost:8080/api/alerts/${id}`, { method: 'DELETE', credentials: 'include' })
             .then(res => {
                 if (res.ok) {
-                    this.loadAlerts(); // Refresh list
+                    this.loadAllData();
                 }
             });
     }
 
     handleCreateAlert(e) {
         e.preventDefault();
-
         const alertData = {
             title: document.getElementById('alert-title-en').value,
             content: document.getElementById('alert-description-en').value,
@@ -151,7 +302,7 @@ class AdminManager {
             if (res.ok) {
                 alert('Alert Created Successfully');
                 this.closeAlertModal();
-                this.loadAlerts();
+                this.loadAllData();
                 e.target.reset();
             } else {
                 alert('Failed to create alert');
@@ -159,19 +310,7 @@ class AdminManager {
         });
     }
 
-    // --- UI RENDERING ---
-
-    updateStats() {
-        // Ensure elements exist before trying to update them
-        const pendingCount = document.getElementById('pending-count');
-        if (pendingCount) pendingCount.textContent = this.pendingReports.length;
-
-        const approvedCount = document.getElementById('approved-count');
-        if (approvedCount) approvedCount.textContent = this.approvedReports.length;
-
-        const alertsCount = document.getElementById('alerts-count');
-        if (alertsCount) alertsCount.textContent = this.alerts.length;
-    }
+    // --- RENDER LISTS ---
 
     renderHelpRequests() {
         const container = document.getElementById('help-requests-list');
@@ -183,31 +322,30 @@ class AdminManager {
             return;
         }
 
-        // Sort by ID desc (newest first)
         this.helpRequests.sort((a, b) => b.id - a.id);
-
         this.helpRequests.forEach(req => {
             const card = document.createElement('div');
-            card.className = `report-card rescue-needed`; // Use existing red style
-
-            // Format list of needs
+            card.className = `report-card rescue-needed`;
             let needsHtml = '';
             if (req.needs && req.needs.length > 0) {
-                needsHtml = `<div style="margin-top:5px; font-weight:bold; color:#FFD700;">Needs: ${req.needs.join(', ')}</div>`;
+                needsHtml = `<div style="margin-top:5px; font-weight:bold; color:#FFD700;">Needs: ${Array.isArray(req.needs) ? req.needs.join(', ') : req.needs}</div>`;
             }
-
+            // ADDED: Status badge for Help Requests
             card.innerHTML = `
                 <div class="report-header">
-                    <div class="report-title">
-                        <i class="fas fa-hands-helping"></i> ${req.name}
-                    </div>
-                    <div class="report-type">HELP REQUEST</div>
+                    <div class="report-title"><i class="fas fa-hands-helping"></i> ${req.name}</div>
+                    <div class="report-type" style="background:#F44336;">HELP</div>
                 </div>
                 <div class="report-description">
                     <p><strong>Phone:</strong> <a href="tel:${req.phone}" style="color:#fff;">${req.phone}</a></p>
                     <p><strong>Location:</strong> ${req.latitude}, ${req.longitude}</p>
                     <p><strong>Details:</strong> ${req.details}</p>
                     ${needsHtml}
+                    <div style="margin-top:8px;">
+                        <span style="background:rgba(255,152,0,0.2); color:#FF9800; border:1px solid #FF9800; padding:2px 8px; border-radius:10px; font-size:0.8rem; font-weight:bold;">
+                            STATUS: ACTIVE
+                        </span>
+                    </div>
                 </div>
             `;
             container.appendChild(card);
@@ -227,14 +365,25 @@ class AdminManager {
         this.pendingReports.forEach(report => {
             const card = document.createElement('div');
             card.className = `report-card ${report.type}`;
+
+            // ADDED: Status Badge Logic
+            const status = report.status ? report.status.toUpperCase() : 'PENDING';
+            const statusColor = status === 'APPROVED' ? '#4CAF50' : '#FF9800'; // Green or Orange
+
             card.innerHTML = `
                 <div class="report-header">
-                    <div class="report-title">${report.name}</div>
+                    <div class="report-title">
+                        ${report.name}
+                        <span style="background:${statusColor}20; color:${statusColor}; border:1px solid ${statusColor}; padding:2px 8px; border-radius:10px; font-size:0.7rem; margin-left:10px;">
+                            ${status}
+                        </span>
+                    </div>
                     <div class="report-type">${report.type}</div>
                 </div>
                 <div class="report-description">${report.description}</div>
-                <div class="report-severity">Severity: ${report.severity}</div>
+                <div class="report-severity">Severity: <strong>${report.severity}</strong></div>
                 <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
+                
                 <div class="report-actions">
                     <button class="btn-approve" onclick="window.adminManager.approveReport(${report.id})">Approve</button>
                     <button class="btn-reject" onclick="window.adminManager.rejectReport(${report.id})">Reject</button>
@@ -256,10 +405,8 @@ class AdminManager {
 
         this.alerts.forEach(alert => {
             const card = document.createElement('div');
-            // Check for severity, default to 'low' if null
             const sev = alert.severity ? alert.severity.toLowerCase() : 'low';
             card.className = `alert-card ${sev}`;
-
             card.innerHTML = `
                 <div class="alert-header">
                     <h3>${alert.title}</h3>
@@ -276,15 +423,8 @@ class AdminManager {
         });
     }
 
-    openAlertModal() {
-        const modal = document.getElementById('alert-modal');
-        if (modal) modal.style.display = 'block';
-    }
-
-    closeAlertModal() {
-        const modal = document.getElementById('alert-modal');
-        if (modal) modal.style.display = 'none';
-    }
+    openAlertModal() { document.getElementById('alert-modal').style.display = 'block'; }
+    closeAlertModal() { document.getElementById('alert-modal').style.display = 'none'; }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
