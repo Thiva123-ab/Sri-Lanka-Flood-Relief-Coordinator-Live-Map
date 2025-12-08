@@ -11,8 +11,17 @@ class HelpFeedManager {
         const container = document.getElementById('help-feed-list');
         if (!container) return;
 
-        fetch('http://localhost:8080/api/help-requests')
-            .then(res => res.json())
+        // FIXED: Added { credentials: 'include' } to send the login session cookie
+        fetch('http://localhost:8080/api/help-requests', {
+            credentials: 'include'
+        })
+            .then(res => {
+                // Check if the request was successful (e.g., not 401 Unauthorized)
+                if (!res.ok) {
+                    throw new Error(`Server returned ${res.status} ${res.statusText}`);
+                }
+                return res.json();
+            })
             .then(data => {
                 container.innerHTML = '';
 
@@ -25,7 +34,7 @@ class HelpFeedManager {
                     return;
                 }
 
-                // Sort newest first
+                // Sort newest first (by ID descending)
                 data.sort((a, b) => b.id - a.id);
 
                 data.forEach(req => {
@@ -34,8 +43,12 @@ class HelpFeedManager {
                 });
             })
             .catch(err => {
-                console.error(err);
-                container.innerHTML = '<p style="text-align:center; color:#F44336;">Failed to load requests.</p>';
+                console.error("Feed Error:", err);
+                container.innerHTML = `
+                    <div style="text-align:center; color:#F44336; margin-top: 20px;">
+                        <p>Failed to load requests.</p>
+                        <small style="color:#aaa;">(Please ensure you are logged in and the backend is running)</small>
+                    </div>`;
             });
     }
 

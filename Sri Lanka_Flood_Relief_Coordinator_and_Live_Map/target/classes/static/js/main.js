@@ -36,7 +36,7 @@ class FloodReliefApp {
         const placeForm = document.getElementById('place-form');
         if (placeForm) placeForm.addEventListener('submit', (e) => this.handleSubmitPlace(e));
 
-        // Connect the Help Form Listener
+        // --- CONNECTING THE HELP FORM ---
         const helpForm = document.getElementById('help-form');
         if (helpForm) helpForm.addEventListener('submit', (e) => this.handleHelpRequest(e));
 
@@ -291,11 +291,11 @@ class FloodReliefApp {
         }
     }
 
-    // --- NEW HELP REQUEST LOGIC ---
+    // --- NEW HELP REQUEST LOGIC (Corrected Endpoint) ---
     handleHelpRequest(e) {
         e.preventDefault();
 
-        // 1. Auth Check (Must be logged in to track user)
+        // 1. Auth Check (Must be logged in to track user, per SecurityConfig)
         if (!window.authManager || !window.authManager.isAuthenticated()) {
             alert("You must be logged in to request help.");
             window.location.href = "login.html";
@@ -313,24 +313,25 @@ class FloodReliefApp {
         // 3. Helper to send data
         const submitData = (lat, lng) => {
             // Combine text location into details since backend needs text there
-            // Backend expects 'needs' as a List<String>
-            const fullDetails = `Location Description: ${locationText} \nDetails: ${description} \nUrgent: ${isUrgent ? "YES" : "NO"}`;
+            // Backend "details" field will store the user's written location + description + urgency
+            const fullDetails = `Location: ${locationText} \nDetails: ${description} \nUrgent: ${isUrgent ? "YES" : "NO"}`;
 
             const payload = {
                 name: name,
                 phone: phone,
                 latitude: lat,
                 longitude: lng,
-                needs: [type], // Backend expects a List
+                needs: [type], // Backend expects a List<String>, so we wrap the single value in an array
                 details: fullDetails
             };
 
+            // CONNECTING TO CORRECT ENDPOINT: HelpRequestController
             fetch('http://localhost:8080/api/help-requests', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include', // Sends session cookie
+                credentials: 'include', // Sends session cookie for authentication
                 body: JSON.stringify(payload)
             })
                 .then(res => {
@@ -357,7 +358,7 @@ class FloodReliefApp {
                 },
                 (err) => {
                     console.warn("Location access denied or failed", err);
-                    // Send 0.0 if location fails, relying on the text description
+                    // Send 0.0 if location fails, relying on the text description inside 'details'
                     submitData(0.0, 0.0);
                 }
             );
