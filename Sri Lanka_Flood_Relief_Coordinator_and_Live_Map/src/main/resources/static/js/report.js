@@ -79,11 +79,44 @@ class ReportManager {
             }
         }
 
+        // --- NEW STATUS BADGE LOGIC ---
+        // Defaults to 'APPROVED' if status is missing (since we fetched from /approved)
+        // But handles 'PENDING' or 'REJECTED' if data source changes.
+        const status = report.status ? report.status.toUpperCase() : 'APPROVED';
+
+        let statusColor = '#00C851'; // Default Green (Approved)
+        let statusIcon = 'check-circle';
+
+        if (status === 'PENDING') {
+            statusColor = '#FF9800'; // Orange
+            statusIcon = 'clock';
+        } else if (status === 'REJECTED') {
+            statusColor = '#ff4444'; // Red
+            statusIcon = 'times-circle';
+        }
+
+        // Generate the Badge HTML
+        const statusBadge = `
+            <span style="background-color: ${statusColor}20; 
+                         color: ${statusColor}; 
+                         border: 1px solid ${statusColor}; 
+                         font-size: 0.65rem; 
+                         padding: 2px 8px; 
+                         border-radius: 12px; 
+                         display: inline-flex; 
+                         align-items: center; 
+                         gap: 4px; 
+                         margin-left: 10px; 
+                         vertical-align: middle;">
+                <i class="fas fa-${statusIcon}"></i> ${status}
+            </span>
+        `;
+
         card.innerHTML = `
             <div class="report-header">
                 <div class="report-title">
                     ${report.name || 'Unknown Location'}
-                    <span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                    ${statusBadge}
                 </div>
                 <div class="report-type">${(report.type || 'General').toUpperCase().replace('-', ' ')}</div>
             </div>
