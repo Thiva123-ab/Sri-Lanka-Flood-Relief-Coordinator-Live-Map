@@ -36,6 +36,7 @@ class FloodReliefApp {
         const placeForm = document.getElementById('place-form');
         if (placeForm) placeForm.addEventListener('submit', (e) => this.handleSubmitPlace(e));
 
+        // Connect the Help Form Listener
         const helpForm = document.getElementById('help-form');
         if (helpForm) helpForm.addEventListener('submit', (e) => this.handleHelpRequest(e));
 
@@ -105,14 +106,13 @@ class FloodReliefApp {
         }
     }
 
-    // FIXED: Added credentials: 'include'
     sendReportToBackend(report) {
         fetch('http://localhost:8080/api/markers/report', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include', // <--- CRITICAL FIX: Sends the session cookie
+            credentials: 'include',
             body: JSON.stringify(report)
         })
             .then(response => {
@@ -291,10 +291,79 @@ class FloodReliefApp {
         }
     }
 
+    // --- NEW HELP REQUEST LOGIC ---
     handleHelpRequest(e) {
         e.preventDefault();
-        alert('Help request submitted successfully!');
-        e.target.reset();
+
+        // 1. Auth Check (Must be logged in to track user)
+        if (!window.authManager || !window.authManager.isAuthenticated()) {
+            alert("You must be logged in to request help.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        // 2. Gather Data from Form
+        const name = document.getElementById('help-name').value;
+        const phone = document.getElementById('help-phone').value;
+        const locationText = document.getElementById('help-location').value;
+        const type = document.getElementById('help-type').value;
+        const description = document.getElementById('help-description').value;
+        const isUrgent = document.getElementById('help-urgent').checked;
+
+        // 3. Helper to send data
+        const submitData = (lat, lng) => {
+            // Combine text location into details since backend needs text there
+            // Backend expects 'needs' as a List<String>
+            const fullDetails = `Location Description: ${locationText} \nDetails: ${description} \nUrgent: ${isUrgent ? "YES" : "NO"}`;
+
+            const payload = {
+                name: name,
+                phone: phone,
+                latitude: lat,
+                longitude: lng,
+                needs: [type], // Backend expects a List
+                details: fullDetails
+            };
+
+            fetch('http://localhost:8080/api/help-requests', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include', // Sends session cookie
+                body: JSON.stringify(payload)
+            })
+                .then(res => {
+                    if (res.ok) {
+                        return res.json();
+                    }
+                    throw new Error("Failed to submit");
+                })
+                .then(data => {
+                    alert('Help Request Sent Successfully! Rescue teams have been notified.');
+                    e.target.reset();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error sending help request. Please check connection.');
+                });
+        };
+
+        // 4. Get Geolocation (Backend requires double lat/long)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    submitData(pos.coords.latitude, pos.coords.longitude);
+                },
+                (err) => {
+                    console.warn("Location access denied or failed", err);
+                    // Send 0.0 if location fails, relying on the text description
+                    submitData(0.0, 0.0);
+                }
+            );
+        } else {
+            submitData(0.0, 0.0);
+        }
     }
 }
 
