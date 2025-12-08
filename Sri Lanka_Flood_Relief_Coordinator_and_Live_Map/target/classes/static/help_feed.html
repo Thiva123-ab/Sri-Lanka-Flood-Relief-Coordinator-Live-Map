@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Help Requests - Flood Relief Sri Lanka</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<header class="app-header">
+    <div class="logo">
+        <h1>🌊 Flood Relief SL</h1>
+    </div>
+    <div class="user-info">
+        <span id="user-role">Member</span>
+        <button id="logout-btn" class="btn btn-secondary">Logout</button>
+    </div>
+</header>
+
+<main class="main-container">
+    <div class="admin-dashboard">
+        <h1>Community Help Requests</h1>
+        <p style="text-align:center; color:#ddd; margin-bottom:20px;">
+            <a href="help.html" style="color:#4CAF50;">&larr; Back to Request Form</a>
+        </p>
+
+        <div class="section">
+            <div id="help-feed-list" class="reports-list">
+                <p style="text-align: center; color: #ccc;">Loading requests...</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn" data-tab="map">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Map</span>
+        </button>
+        <button class="nav-btn" data-tab="reports">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Reports</span>
+        </button>
+        <button class="nav-btn" data-tab="alerts">
+            <i class="fas fa-bell"></i>
+            <span>Alerts</span>
+        </button>
+        <button class="nav-btn active" data-tab="profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+    </nav>
+</main>
+
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <h2>🌊 Flood Relief SL</h2>
+            <p>Protecting Sri Lankan communities from flood risks</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+<script src="js/help_feed.js"></script>
+
+</body>
+</html>

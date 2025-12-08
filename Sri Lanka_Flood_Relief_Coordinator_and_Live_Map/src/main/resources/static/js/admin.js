@@ -5,6 +5,7 @@ class AdminManager {
         this.pendingReports = [];
         this.approvedReports = [];
         this.alerts = [];
+        this.helpRequests = [];
         this.init();
     }
 
@@ -17,6 +18,7 @@ class AdminManager {
 
         this.loadReports();
         this.loadAlerts();
+        this.loadHelpRequests(); // New Function Call
         this.setupEventListeners();
     }
 
@@ -51,9 +53,18 @@ class AdminManager {
 
     // --- API CONNECTIONS ---
 
+    loadHelpRequests() {
+        fetch('http://localhost:8080/api/help-requests', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                this.helpRequests = data;
+                this.renderHelpRequests();
+            })
+            .catch(err => console.error("Error loading help requests:", err));
+    }
+
     loadReports() {
         // 1. Fetch Pending Reports (Correct Endpoint)
-        //
         fetch('http://localhost:8080/api/markers/pending', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
@@ -64,7 +75,6 @@ class AdminManager {
             .catch(err => console.error("Error loading pending reports:", err));
 
         // 2. Fetch Approved Reports (Correct Endpoint)
-        //
         fetch('http://localhost:8080/api/markers/approved', { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
@@ -161,6 +171,47 @@ class AdminManager {
 
         const alertsCount = document.getElementById('alerts-count');
         if (alertsCount) alertsCount.textContent = this.alerts.length;
+    }
+
+    renderHelpRequests() {
+        const container = document.getElementById('help-requests-list');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (this.helpRequests.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#ccc;">No active help requests</p>';
+            return;
+        }
+
+        // Sort by ID desc (newest first)
+        this.helpRequests.sort((a, b) => b.id - a.id);
+
+        this.helpRequests.forEach(req => {
+            const card = document.createElement('div');
+            card.className = `report-card rescue-needed`; // Use existing red style
+
+            // Format list of needs
+            let needsHtml = '';
+            if (req.needs && req.needs.length > 0) {
+                needsHtml = `<div style="margin-top:5px; font-weight:bold; color:#FFD700;">Needs: ${req.needs.join(', ')}</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="report-header">
+                    <div class="report-title">
+                        <i class="fas fa-hands-helping"></i> ${req.name}
+                    </div>
+                    <div class="report-type">HELP REQUEST</div>
+                </div>
+                <div class="report-description">
+                    <p><strong>Phone:</strong> <a href="tel:${req.phone}" style="color:#fff;">${req.phone}</a></p>
+                    <p><strong>Location:</strong> ${req.latitude}, ${req.longitude}</p>
+                    <p><strong>Details:</strong> ${req.details}</p>
+                    ${needsHtml}
+                </div>
+            `;
+            container.appendChild(card);
+        });
     }
 
     renderPendingReports() {

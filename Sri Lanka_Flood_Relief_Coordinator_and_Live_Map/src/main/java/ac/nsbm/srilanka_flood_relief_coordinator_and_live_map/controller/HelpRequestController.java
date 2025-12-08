@@ -5,6 +5,8 @@ import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.repository.HelpReq
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/help-requests")
 public class HelpRequestController {
@@ -15,5 +17,10 @@ public class HelpRequestController {
     @PostMapping
     public HelpRequest submitHelpRequest(@RequestBody HelpRequest request) {
         return helpRequestRepository.save(request);
+    }
+
+    @GetMapping
+    public List<HelpRequest> getAllHelpRequests() {
+        return helpRequestRepository.findAll();
     }
 }
