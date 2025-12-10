@@ -4,7 +4,7 @@ import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.model.MapMarker;
 import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.service.MapMarkerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication; // NEW
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,26 +16,30 @@ public class MapController {
     @Autowired
     private MapMarkerService mapMarkerService;
 
+    // Public: Only Approved
     @GetMapping("/approved")
     public List<MapMarker> getPublicMarkers() {
         return mapMarkerService.getApprovedMarkers();
     }
 
+    // Admin: Pending reports
     @GetMapping("/pending")
     public List<MapMarker> getPendingMarkers() {
         return mapMarkerService.getPendingMarkers();
     }
 
-    // NEW: For Admin to see rejected
+    // Admin: Rejected reports
     @GetMapping("/rejected")
     public List<MapMarker> getRejectedMarkers() {
         return mapMarkerService.getRejectedMarkers();
     }
 
-    // NEW: For Members to see their own history
+    // Member: All THEIR OWN reports (Pending, Rejected, Approved)
     @GetMapping("/my-reports")
     public List<MapMarker> getMyReports(Authentication authentication) {
-        if (authentication == null) return List.of();
+        if (authentication == null) {
+            return List.of();
+        }
         return mapMarkerService.getUserMarkers(authentication.getName());
     }
 
@@ -50,7 +54,6 @@ public class MapController {
         return ResponseEntity.ok("Marker Approved");
     }
 
-    // UPDATED: Changed to PUT since we are updating status, not deleting
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> rejectMarker(@PathVariable Long id) {
         mapMarkerService.rejectMarker(id);

@@ -8,37 +8,29 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <style>
-    /* Ensure the modal is centered and scrollable on small screens */
     .modal {
       align-items: center;
       justify-content: center;
-      padding-bottom: 80px; /* Extra space for bottom nav */
+      padding-bottom: 80px;
     }
-
-    /* Override default display behavior to use Flexbox for centering */
     .modal[style*="display: block"] {
       display: flex !important;
     }
-
     .modal-content {
-      margin: 0 !important; /* Remove the old top margin */
-      max-height: 80vh;     /* Limit height to 80% of the screen */
-      overflow-y: auto;     /* Enable internal scrolling */
+      margin: 0 !important;
+      max-height: 80vh;
+      overflow-y: auto;
       width: 90%;
       max-width: 500px;
     }
+    .modal-content::-webkit-scrollbar { width: 8px; }
+    .modal-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
+    .modal-content::-webkit-scrollbar-thumb { background: #4CAF50; border-radius: 4px; }
 
-    /* Custom Scrollbar styling for the modal */
-    .modal-content::-webkit-scrollbar {
-      width: 8px;
-    }
-    .modal-content::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .modal-content::-webkit-scrollbar-thumb {
-      background: #4CAF50;
-      border-radius: 4px;
-    }
+    /* New Stat Card Styles for Member Dashboard */
+    .stat-card.pending { border-left: 4px solid #FF9800; }
+    .stat-card.rejected { border-left: 4px solid #f44336; }
+    .stat-card.approved { border-left: 4px solid #4CAF50; }
   </style>
 </head>
 <body>
@@ -54,16 +46,21 @@
 </header>
 
 <main class="main-container">
-  <div class="admin-dashboard"> <h1>Community Reports</h1>
+  <div class="admin-dashboard">
+    <h1>My Report Status</h1>
 
     <div class="dashboard-stats">
-      <div class="stat-card">
-        <h3><i class="fas fa-check-circle"></i> Verified Incidents</h3>
-        <p id="total-reports-count">0</p>
+      <div class="stat-card pending">
+        <h3><i class="fas fa-clock" style="color: #FF9800;"></i> Pending</h3>
+        <p id="my-pending-count">0</p>
       </div>
-      <div class="stat-card">
-        <h3><i class="fas fa-clock"></i> Recent Updates</h3>
-        <p id="recent-reports-count">0</p>
+      <div class="stat-card approved">
+        <h3><i class="fas fa-check-circle" style="color: #4CAF50;"></i> Approved</h3>
+        <p id="my-approved-count">0</p>
+      </div>
+      <div class="stat-card rejected">
+        <h3><i class="fas fa-times-circle" style="color: #f44336;"></i> Rejected</h3>
+        <p id="my-rejected-count">0</p>
       </div>
     </div>
 

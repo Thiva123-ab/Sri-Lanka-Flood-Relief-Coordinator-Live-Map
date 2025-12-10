@@ -1,4 +1,4 @@
-// Report Manager handles the Public Reports Feed
+// Report Manager handles the Member Reports Feed
 class ReportManager {
     constructor() {
         this.init();
@@ -12,47 +12,46 @@ class ReportManager {
         const container = document.getElementById('public-reports-list');
         if (!container) return;
 
-        // Show loading state
         container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading reports...</p>';
 
-        // 1. Fetch Approved Reports (Public - Everyone sees these)
+        // 1. Fetch Approved Reports (Public)
         const fetchApproved = fetch('http://localhost:8080/api/markers/approved')
             .then(res => res.json())
             .catch(err => []);
 
-        // 2. Fetch My Reports (Authenticated User - Sees Pending/Approved/Rejected)
-        // Note: You need to implement /api/markers/my-reports in backend as discussed
+        // 2. Fetch My Reports (Authenticated User)
         const fetchMyReports = fetch('http://localhost:8080/api/markers/my-reports', { credentials: 'include' })
             .then(res => {
                 if (res.ok) return res.json();
-                return []; // If 401/403 (Guest), return empty
+                return [];
             })
             .catch(err => []);
 
-        // 3. Process Lists
+        // 3. Process Both Lists
         Promise.all([fetchApproved, fetchMyReports])
             .then(([approved, myReports]) => {
                 container.innerHTML = '';
 
-                // Create a Map to merge lists and handle duplicates (prefer 'myReports' for personal status)
+                // --- UPDATE DASHBOARD STATS COUNTS ---
+                this.updateMemberStats(myReports);
+
+                // --- MERGE LISTS FOR DISPLAY ---
+                // We use a Map to merge. 'myReports' overrides 'approved' so users see their own status.
                 const reportMap = new Map();
 
-                // Add approved first
+                // Add approved reports first
                 approved.forEach(r => reportMap.set(r.id, r));
 
-                // Add/Overwrite with myReports (so I see my own Rejected/Pending status)
+                // Add/Overwrite with myReports (contains specific PENDING/REJECTED status)
                 myReports.forEach(r => reportMap.set(r.id, r));
 
                 const allReports = Array.from(reportMap.values());
 
-                this.updateStats(approved, myReports);
-
-                // Handle Empty State
                 if (allReports.length === 0) {
                     container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #ccc;">
                         <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>No verified incidents found.</p>
+                        <p>No reports found.</p>
                     </div>`;
                     return;
                 }
@@ -72,18 +71,20 @@ class ReportManager {
             });
     }
 
-    updateStats(approvedReports, myReports) {
-        const totalCount = document.getElementById('total-reports-count');
-        const recentCount = document.getElementById('recent-reports-count');
+    updateMemberStats(myReports) {
+        // Calculate counts based on status
+        const pendingCount = myReports.filter(r => r.status && r.status.toLowerCase() === 'pending').length;
+        const rejectedCount = myReports.filter(r => r.status && r.status.toLowerCase() === 'rejected').length;
+        const approvedCount = myReports.filter(r => r.status && r.status.toLowerCase() === 'approved').length;
 
-        if (totalCount) {
-            totalCount.textContent = approvedReports.length;
-        }
+        // Update DOM elements
+        const pendingEl = document.getElementById('my-pending-count');
+        const rejectedEl = document.getElementById('my-rejected-count');
+        const approvedEl = document.getElementById('my-approved-count');
 
-        if (recentCount) {
-            // "Recent Updates" implies active things (approved) + my pending/rejected contributions
-            recentCount.textContent = approvedReports.length + myReports.length;
-        }
+        if (pendingEl) pendingEl.textContent = pendingCount;
+        if (rejectedEl) rejectedEl.textContent = rejectedCount;
+        if (approvedEl) approvedEl.textContent = approvedCount;
     }
 
     createPublicReportCard(report) {
@@ -92,7 +93,7 @@ class ReportManager {
         // --- STATUS BADGE LOGIC ---
         const status = report.status ? report.status.toUpperCase() : 'APPROVED';
 
-        let statusColor = '#00C851'; // Green
+        let statusColor = '#00C851'; // Green (Approved)
         let statusIcon = 'check-circle';
         let borderColor = '#00C851';
         let cardClass = report.type;
@@ -105,16 +106,14 @@ class ReportManager {
             statusColor = '#ff4444'; // Red
             borderColor = '#ff4444';
             statusIcon = 'times-circle';
-            // Force visual style for rejected
             cardClass += ' rejected-card';
         }
 
         card.className = `report-card ${cardClass}`;
 
-        // If rejected, override border color manually to be safe
         if(status === 'REJECTED') {
             card.style.borderLeftColor = '#ff4444';
-            card.style.opacity = '0.8';
+            card.style.opacity = '0.85';
         }
 
         // Format date
@@ -138,7 +137,8 @@ class ReportManager {
                          gap: 4px; 
                          margin-left: 10px; 
                          vertical-align: middle;
-                         text-transform: uppercase;">
+                         text-transform: uppercase;
+                         font-weight: bold;">
                 <i class="fas fa-${statusIcon}"></i> ${status}
             </span>
         `;
