@@ -4,6 +4,7 @@ class AdminManager {
     constructor() {
         this.pendingReports = [];
         this.approvedReports = [];
+        this.rejectedReports = []; // Added rejected array
         this.alerts = [];
         this.helpRequests = [];
         this.incidentChart = null;
@@ -72,7 +73,12 @@ class AdminManager {
             const approvedRes = await fetch('http://localhost:8080/api/markers/approved', { credentials: 'include' });
             this.approvedReports = await approvedRes.json();
 
-            // 4. Fetch Alerts
+            // 4. Fetch Rejected Reports (NEW)
+            const rejectedRes = await fetch('http://localhost:8080/api/markers/rejected', { credentials: 'include' });
+            this.rejectedReports = await rejectedRes.json();
+            this.renderRejectedReports();
+
+            // 5. Fetch Alerts
             const alertsRes = await fetch('http://localhost:8080/api/alerts', { credentials: 'include' });
             this.alerts = await alertsRes.json();
             this.renderAlerts();
@@ -100,6 +106,9 @@ class AdminManager {
 
         const approvedCount = document.getElementById('approved-count');
         if (approvedCount) approvedCount.textContent = this.approvedReports.length;
+
+        const rejectedCount = document.getElementById('rejected-count');
+        if (rejectedCount) rejectedCount.textContent = this.rejectedReports.length;
 
         const alertsCount = document.getElementById('alerts-count');
         if (alertsCount) alertsCount.textContent = this.alerts.length;
@@ -261,8 +270,9 @@ class AdminManager {
     }
 
     rejectReport(id) {
-        if (!confirm('Reject this report?')) return;
-        fetch(`http://localhost:8080/api/markers/${id}/reject`, { method: 'DELETE', credentials: 'include' })
+        if (!confirm('Reject this report? This will change status to Rejected.')) return;
+        // CHANGED: Use PUT to update status instead of DELETE
+        fetch(`http://localhost:8080/api/markers/${id}/reject`, { method: 'PUT', credentials: 'include' })
             .then(res => {
                 if (res.ok) {
                     alert('Report Rejected');
@@ -330,7 +340,7 @@ class AdminManager {
             if (req.needs && req.needs.length > 0) {
                 needsHtml = `<div style="margin-top:5px; font-weight:bold; color:#FFD700;">Needs: ${Array.isArray(req.needs) ? req.needs.join(', ') : req.needs}</div>`;
             }
-            // ADDED: Status badge for Help Requests
+
             card.innerHTML = `
                 <div class="report-header">
                     <div class="report-title"><i class="fas fa-hands-helping"></i> ${req.name}</div>
@@ -366,9 +376,44 @@ class AdminManager {
             const card = document.createElement('div');
             card.className = `report-card ${report.type}`;
 
-            // ADDED: Status Badge Logic
+            // Status Badge
             const status = report.status ? report.status.toUpperCase() : 'PENDING';
-            const statusColor = status === 'APPROVED' ? '#4CAF50' : '#FF9800'; // Green or Orange
+            const statusColor = status === 'APPROVED' ? '#4CAF50' : '#FF9800';
+
+            // Modern button styles
+            const btnApproveStyle = `
+                flex: 1;
+                background: linear-gradient(135deg, #28a745, #218838);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-weight: 600;
+                transition: transform 0.2s, box-shadow 0.2s;
+                box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
+            `;
+
+            const btnRejectStyle = `
+                flex: 1;
+                background: linear-gradient(135deg, #dc3545, #c82333);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-weight: 600;
+                transition: transform 0.2s, box-shadow 0.2s;
+                box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);
+            `;
 
             card.innerHTML = `
                 <div class="report-header">
@@ -384,9 +429,69 @@ class AdminManager {
                 <div class="report-severity">Severity: <strong>${report.severity}</strong></div>
                 <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
                 
-                <div class="report-actions">
-                    <button class="btn-approve" onclick="window.adminManager.approveReport(${report.id})">Approve</button>
-                    <button class="btn-reject" onclick="window.adminManager.rejectReport(${report.id})">Reject</button>
+                <div class="report-actions" style="margin-top: 15px; display: flex; gap: 15px;">
+                    <button style="${btnApproveStyle}" 
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(40, 167, 69, 0.4)'" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(40, 167, 69, 0.3)'"
+                            onclick="window.adminManager.approveReport(${report.id})">
+                        <i class="fas fa-check"></i> Accept
+                    </button>
+                    <button style="${btnRejectStyle}" 
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(220, 53, 69, 0.4)'" 
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(220, 53, 69, 0.3)'"
+                            onclick="window.adminManager.rejectReport(${report.id})">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    renderRejectedReports() {
+        const container = document.getElementById('rejected-reports');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (this.rejectedReports.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#ccc;">No rejected reports</p>';
+            return;
+        }
+
+        this.rejectedReports.forEach(report => {
+            const card = document.createElement('div');
+            card.className = `report-card ${report.type}`;
+            card.style.borderLeft = "5px solid #dc3545"; // Force Red Border
+            card.style.opacity = "0.7";
+
+            const btnReApproveStyle = `
+                flex: 1;
+                background: linear-gradient(135deg, #28a745, #218838);
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.8rem;
+                margin-top: 10px;
+            `;
+
+            card.innerHTML = `
+                <div class="report-header">
+                    <div class="report-title">
+                        ${report.name}
+                        <span style="background:#dc3545; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.7rem; margin-left:10px;">
+                            REJECTED
+                        </span>
+                    </div>
+                    <div class="report-type">${report.type}</div>
+                </div>
+                <div class="report-description">${report.description}</div>
+                <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
+                <div>
+                    <button style="${btnReApproveStyle}" onclick="window.adminManager.approveReport(${report.id})">
+                        Re-evaluate (Approve)
+                    </button>
                 </div>
             `;
             container.appendChild(card);

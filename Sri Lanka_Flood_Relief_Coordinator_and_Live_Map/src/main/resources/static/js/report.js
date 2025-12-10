@@ -5,75 +5,59 @@ class ReportManager {
     }
 
     init() {
-        this.loadPublicReports();
+        this.loadReports();
     }
 
-    loadPublicReports() {
+    loadReports() {
         const container = document.getElementById('public-reports-list');
         if (!container) return;
 
         // Show loading state
         container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading reports...</p>';
 
-        // 1. Fetch Approved Reports (Public)
+        // 1. Fetch Approved Reports (Public - Everyone sees these)
         const fetchApproved = fetch('http://localhost:8080/api/markers/approved')
             .then(res => res.json())
-            .catch(err => {
-                console.error("Failed to load approved:", err);
-                return [];
-            });
+            .catch(err => []);
 
-        // 2. Fetch Pending Reports (Authenticated only) - with credentials
-        const fetchPending = fetch('http://localhost:8080/api/markers/pending', { credentials: 'include' })
+        // 2. Fetch My Reports (Authenticated User - Sees Pending/Approved/Rejected)
+        // Note: You need to implement /api/markers/my-reports in backend as discussed
+        const fetchMyReports = fetch('http://localhost:8080/api/markers/my-reports', { credentials: 'include' })
             .then(res => {
                 if (res.ok) return res.json();
-                return []; // Return empty array if not logged in (401/403)
+                return []; // If 401/403 (Guest), return empty
             })
-            .catch(err => {
-                // It's okay if this fails for guests
-                return [];
-            });
+            .catch(err => []);
 
-        // 3. Process Both Lists
-        Promise.all([fetchApproved, fetchPending])
-            .then(([approved, pending]) => {
-                container.innerHTML = ''; // Clear loading text
+        // 3. Process Lists
+        Promise.all([fetchApproved, fetchMyReports])
+            .then(([approved, myReports]) => {
+                container.innerHTML = '';
 
-                // Get Current User
-                let currentUser = null;
-                const userJson = localStorage.getItem('floodReliefUser');
-                if (userJson) {
-                    currentUser = JSON.parse(userJson);
-                }
+                // Create a Map to merge lists and handle duplicates (prefer 'myReports' for personal status)
+                const reportMap = new Map();
 
-                // Filter Pending Reports
-                let myPending = [];
-                if (currentUser) {
-                    if (currentUser.role === 'ADMIN' || currentUser.role === 'ROLE_ADMIN') {
-                        // Admins see all pending
-                        myPending = pending;
-                    } else {
-                        // Members only see THEIR OWN pending reports
-                        myPending = pending.filter(p => p.submittedBy === currentUser.username);
-                    }
-                }
+                // Add approved first
+                approved.forEach(r => reportMap.set(r.id, r));
 
-                // Combine Approved + My Pending
-                const allReports = [...myPending, ...approved];
+                // Add/Overwrite with myReports (so I see my own Rejected/Pending status)
+                myReports.forEach(r => reportMap.set(r.id, r));
 
-                this.updateStats(approved, myPending);
+                const allReports = Array.from(reportMap.values());
+
+                this.updateStats(approved, myReports);
 
                 // Handle Empty State
                 if (allReports.length === 0) {
                     container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #ccc;">
                         <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                        <p>No verified incidents or pending reports found.</p>
+                        <p>No verified incidents found.</p>
                     </div>`;
                     return;
                 }
 
-                // Sort by ID (descending) so newest (pending or approved) are at top
+                // Sort by ID (descending) -> Newest first
                 allReports.sort((a, b) => b.id - a.id);
 
                 // Render Cards
@@ -84,45 +68,34 @@ class ReportManager {
             })
             .catch(err => {
                 console.error(err);
-                container.innerHTML = '<p style="text-align:center; color:#F44336;">Failed to load reports. Please try again later.</p>';
+                container.innerHTML = '<p style="text-align:center; color:#F44336;">Failed to load reports.</p>';
             });
     }
 
-    updateStats(approvedReports, pendingReports) {
+    updateStats(approvedReports, myReports) {
         const totalCount = document.getElementById('total-reports-count');
         const recentCount = document.getElementById('recent-reports-count');
 
         if (totalCount) {
-            // Show total verified
             totalCount.textContent = approvedReports.length;
         }
 
         if (recentCount) {
-            // Show recent activity (Verified + My Pending)
-            recentCount.textContent = approvedReports.length + pendingReports.length;
+            // "Recent Updates" implies active things (approved) + my pending/rejected contributions
+            recentCount.textContent = approvedReports.length + myReports.length;
         }
     }
 
     createPublicReportCard(report) {
         const card = document.createElement('div');
-        card.className = `report-card ${report.type}`;
-
-        // Format date safely
-        let dateStr = 'Recently';
-        if (report.timestamp) {
-            const date = new Date(report.timestamp);
-            if (!isNaN(date)) {
-                dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            }
-        }
 
         // --- STATUS BADGE LOGIC ---
-        // Defaults to 'APPROVED' if status is missing
         const status = report.status ? report.status.toUpperCase() : 'APPROVED';
 
-        let statusColor = '#00C851'; // Default Green (Approved)
+        let statusColor = '#00C851'; // Green
         let statusIcon = 'check-circle';
         let borderColor = '#00C851';
+        let cardClass = report.type;
 
         if (status === 'PENDING') {
             statusColor = '#FF9800'; // Orange
@@ -132,9 +105,27 @@ class ReportManager {
             statusColor = '#ff4444'; // Red
             borderColor = '#ff4444';
             statusIcon = 'times-circle';
+            // Force visual style for rejected
+            cardClass += ' rejected-card';
         }
 
-        // Generate the Badge HTML
+        card.className = `report-card ${cardClass}`;
+
+        // If rejected, override border color manually to be safe
+        if(status === 'REJECTED') {
+            card.style.borderLeftColor = '#ff4444';
+            card.style.opacity = '0.8';
+        }
+
+        // Format date
+        let dateStr = 'Recently';
+        if (report.timestamp) {
+            const date = new Date(report.timestamp);
+            if (!isNaN(date)) {
+                dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+        }
+
         const statusBadge = `
             <span style="background-color: ${statusColor}20; 
                          color: ${statusColor}; 
@@ -183,7 +174,6 @@ class ReportManager {
     }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.reportManager = new ReportManager();
 });

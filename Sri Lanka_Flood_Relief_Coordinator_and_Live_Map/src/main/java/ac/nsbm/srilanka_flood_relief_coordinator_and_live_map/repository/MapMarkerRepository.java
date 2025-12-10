@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface MapMarkerRepository extends JpaRepository<MapMarker, Long> {
     List<MapMarker> findByStatus(String status);
+    List<MapMarker> findBySubmittedBy(String submittedBy); // NEW
 }

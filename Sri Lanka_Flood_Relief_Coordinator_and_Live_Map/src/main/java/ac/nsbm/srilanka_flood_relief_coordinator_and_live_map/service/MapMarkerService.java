@@ -21,6 +21,16 @@ public class MapMarkerService {
         return mapMarkerRepository.findByStatus("pending");
     }
 
+    // NEW: Get rejected markers for Admin
+    public List<MapMarker> getRejectedMarkers() {
+        return mapMarkerRepository.findByStatus("rejected");
+    }
+
+    // NEW: Get all markers for a specific user (Member Dashboard)
+    public List<MapMarker> getUserMarkers(String username) {
+        return mapMarkerRepository.findBySubmittedBy(username);
+    }
+
     public MapMarker reportIssue(MapMarker marker) {
         marker.setStatus("pending");
         marker.setTimestamp(LocalDateTime.now());
@@ -34,7 +44,11 @@ public class MapMarkerService {
         mapMarkerRepository.save(marker);
     }
 
+    // UPDATED: Now sets status to 'rejected' instead of deleting
     public void rejectMarker(Long id) {
-        mapMarkerRepository.deleteById(id);
+        MapMarker marker = mapMarkerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Marker not found"));
+        marker.setStatus("rejected");
+        mapMarkerRepository.save(marker);
     }
 }
