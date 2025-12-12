@@ -57,8 +57,23 @@ class FloodReliefApp {
     closePlaceModal() {
         const modal = document.getElementById('place-modal');
         if (modal) modal.style.display = 'none';
+
+        // 1. Reset the standard form fields
         const placeForm = document.getElementById('place-form');
         if (placeForm) placeForm.reset();
+
+        // 2. Clear the hidden coordinate fields from the map
+        const latInput = document.getElementById('selected-lat');
+        const lngInput = document.getElementById('selected-lng');
+        if (latInput) latInput.value = "";
+        if (lngInput) lngInput.value = "";
+
+        // 3. Reset the visual status text
+        const statusSpan = document.getElementById('location-status');
+        if(statusSpan) {
+            statusSpan.textContent = "Using Device GPS (Click map to change)";
+            statusSpan.style.color = "#ccc";
+        }
     }
 
     handleSubmitPlace(e) {
@@ -76,6 +91,10 @@ class FloodReliefApp {
         const placeDescription = document.getElementById('place-description').value;
         const placeSeverity = document.getElementById('place-severity').value;
 
+        // Get the manually selected coordinates (if any)
+        const selectedLat = document.getElementById('selected-lat').value;
+        const selectedLng = document.getElementById('selected-lng').value;
+
         const report = {
             name: placeName,
             type: placeType,
@@ -85,24 +104,34 @@ class FloodReliefApp {
             submittedBy: window.authManager.getCurrentUser().username,
         };
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    report.lat = position.coords.latitude;
-                    report.lng = position.coords.longitude;
-                    this.sendReportToBackend(report);
-                },
-                (error) => {
-                    console.log("Geolocation error: " + error.message);
-                    report.lat = 7.8731; // Default
-                    report.lng = 80.7718;
-                    this.sendReportToBackend(report);
-                }
-            );
-        } else {
-            report.lat = 7.8731;
-            report.lng = 80.7718;
+        // --- UPDATED LOGIC: Map Selection vs GPS ---
+
+        if (selectedLat && selectedLng) {
+            // CASE A: User clicked a spot on the map
+            report.lat = parseFloat(selectedLat);
+            report.lng = parseFloat(selectedLng);
             this.sendReportToBackend(report);
+        } else {
+            // CASE B: Fallback to device Geolocation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        report.lat = position.coords.latitude;
+                        report.lng = position.coords.longitude;
+                        this.sendReportToBackend(report);
+                    },
+                    (error) => {
+                        console.log("Geolocation error: " + error.message);
+                        alert("Could not detect location automatically. Please click on the map to set the location.");
+                    }
+                );
+            } else {
+                // Default fallback if GPS is not supported
+                report.lat = 7.8731;
+                report.lng = 80.7718;
+                alert("GPS not supported. Defaulting to center of Sri Lanka. Please edit if needed.");
+                this.sendReportToBackend(report);
+            }
         }
     }
 
@@ -127,6 +156,8 @@ class FloodReliefApp {
                 if (window.authManager && window.authManager.isAdmin()) {
                     this.loadPendingReports();
                 }
+                // Refresh map markers if map controller is active
+                if (window.mapController) window.mapController.loadApprovedPlaces();
             })
             .catch(error => {
                 console.error('Error:', error);
