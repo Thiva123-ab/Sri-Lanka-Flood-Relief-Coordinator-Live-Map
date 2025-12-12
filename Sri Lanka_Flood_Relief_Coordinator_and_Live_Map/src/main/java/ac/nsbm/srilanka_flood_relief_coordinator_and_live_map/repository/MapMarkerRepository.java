@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MapMarkerRepository extends JpaRepository<MapMarker, Long> {
+    // Fetch verified markers for the public map
     List<MapMarker> findByStatus(String status);
-    List<MapMarker> findBySubmittedBy(String submittedBy); // NEW
+
+    // Fetch a specific user's markers (to show them their pending reports)
+    List<MapMarker> findBySubmittedBy(String submittedBy);
 }

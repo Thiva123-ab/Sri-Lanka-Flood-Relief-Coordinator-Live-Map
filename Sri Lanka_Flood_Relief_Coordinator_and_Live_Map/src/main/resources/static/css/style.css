@@ -1231,3 +1231,25 @@ body {
     color: #ff4444;
     border: 1px solid #ff4444;
 }
+/* Custom Map Marker Styling */
+.marker-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50% 50% 50% 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -15px 0 0 -15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Optional Pulse Effect for specific markers */
+.marker-pulse {
+    position: absolute;
+    margin-top: -15px; /* Adjust based on pin size */
+    margin-left: -15px;
+    transform: rotateX(55deg);
+}

@@ -12,10 +12,19 @@ class FloodReliefApp {
         this.setupEventListeners();
 
         const path = window.location.pathname;
-        if (path.includes('report.html')) {
+
+        // On Map Page: If Admin, load the pending sidebar
+        if (path.includes('map.html') || path.endsWith('/')) {
+            if (window.authManager && window.authManager.isAdmin()) {
+                this.loadPendingReports();
+                // Show admin panel if it exists
+                const adminPanel = document.getElementById('admin-panel');
+                if(adminPanel) adminPanel.style.display = 'block';
+            }
+        }
+        // On Reports Page: Load public feed (only if report.js isn't doing it)
+        else if (path.includes('report.html')) {
             this.loadPublicReports();
-        } else if (window.authManager && window.authManager.isAdmin()) {
-            this.loadPendingReports();
         }
     }
 
@@ -71,7 +80,7 @@ class FloodReliefApp {
         // 3. Reset the visual status text
         const statusSpan = document.getElementById('location-status');
         if(statusSpan) {
-            statusSpan.textContent = "Using Device GPS (Click map to change)";
+            statusSpan.innerHTML = "Using Device GPS (Click map to change)";
             statusSpan.style.color = "#ccc";
         }
     }
@@ -126,11 +135,7 @@ class FloodReliefApp {
                     }
                 );
             } else {
-                // Default fallback if GPS is not supported
-                report.lat = 7.8731;
-                report.lng = 80.7718;
-                alert("GPS not supported. Defaulting to center of Sri Lanka. Please edit if needed.");
-                this.sendReportToBackend(report);
+                alert("GPS not supported. Please click on the map to set a location.");
             }
         }
     }
@@ -151,13 +156,17 @@ class FloodReliefApp {
                 throw new Error('Failed to submit report (Status: ' + response.status + ')');
             })
             .then(data => {
-                alert('Report submitted successfully! Waiting for admin approval.');
+                alert('Report submitted successfully! It will appear as PENDING until approved.');
                 this.closePlaceModal();
+
+                // --- LIVE UPDATE: Refresh the map immediately ---
+                if (window.mapController) {
+                    window.mapController.loadMapData();
+                }
+
                 if (window.authManager && window.authManager.isAdmin()) {
                     this.loadPendingReports();
                 }
-                // Refresh map markers if map controller is active
-                if (window.mapController) window.mapController.loadApprovedPlaces();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -165,11 +174,11 @@ class FloodReliefApp {
             });
     }
 
-    // --- Admin/Pending Report Logic ---
+    // --- Admin/Pending Report Logic (Corrected Details) ---
 
     loadPendingReports() {
         const container = document.getElementById('pending-reports');
-        if (!container) return;
+        if (!container) return; // Exit if element doesn't exist (e.g. on report.html)
 
         container.innerHTML = '<p style="text-align:center; color:#ccc;">Loading...</p>';
 
@@ -183,6 +192,9 @@ class FloodReliefApp {
                     container.innerHTML = '<p style="text-align:center; color:#ccc;">No pending reports</p>';
                     return;
                 }
+
+                // Sort by ID desc (newest first)
+                this.pendingReports.sort((a,b) => b.id - a.id);
 
                 this.pendingReports.forEach(report => {
                     const reportCard = this.createReportCard(report);
@@ -198,14 +210,29 @@ class FloodReliefApp {
     createReportCard(report) {
         const card = document.createElement('div');
         card.className = `report-card ${report.type}`;
+
+        // Format Timestamp
+        let timeStr = "Just now";
+        if(report.timestamp) {
+            const date = new Date(report.timestamp);
+            timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
+
+        // Add detailed info for Admins
         card.innerHTML = `
             <div class="report-header">
                 <div class="report-title">${report.name}</div>
                 <div class="report-type">${report.type}</div>
             </div>
             <div class="report-description">${report.description}</div>
-            <div class="report-severity">Severity: ${report.severity}</div>
-            <div class="report-submitted">Submitted by: ${report.submittedBy}</div>
+            
+            <div style="font-size: 0.85rem; color: #ddd; margin: 10px 0; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 5px;">
+                <div><i class="fas fa-exclamation-circle"></i> Severity: <strong>${report.severity}</strong></div>
+                <div><i class="fas fa-map-marker-alt"></i> Loc: ${report.lat.toFixed(4)}, ${report.lng.toFixed(4)}</div>
+                <div><i class="fas fa-clock"></i> Time: ${timeStr}</div>
+                <div><i class="fas fa-user"></i> By: ${report.submittedBy}</div>
+            </div>
+
             <div class="report-actions">
                 <button class="btn-approve" onclick="window.floodApp.approveReport(${report.id})">Approve</button>
                 <button class="btn-reject" onclick="window.floodApp.rejectReport(${report.id})">Reject</button>
@@ -286,8 +313,13 @@ class FloodReliefApp {
             .then(res => {
                 if (res.ok) {
                     alert('Report approved!');
-                    this.loadPendingReports();
-                    if (window.mapController) window.mapController.loadApprovedPlaces();
+                    // Live Update
+                    if (window.location.pathname.includes('map.html')) {
+                        this.loadPendingReports(); // Refresh sidebar
+                        if (window.mapController) window.mapController.loadMapData(); // Refresh Map
+                    } else {
+                        location.reload(); // Fallback for other pages
+                    }
                 } else {
                     alert('Failed to approve report');
                 }
@@ -296,11 +328,15 @@ class FloodReliefApp {
 
     rejectReport(reportId) {
         if (!confirm('Reject this report?')) return;
-        fetch(`http://localhost:8080/api/markers/${reportId}/reject`, { method: 'DELETE', credentials: 'include' })
+        fetch(`http://localhost:8080/api/markers/${reportId}/reject`, { method: 'PUT', credentials: 'include' }) // Changed DELETE to PUT for status update
             .then(res => {
                 if (res.ok) {
                     alert('Report rejected!');
-                    this.loadPendingReports();
+                    if (window.location.pathname.includes('map.html')) {
+                        this.loadPendingReports();
+                    } else {
+                        location.reload();
+                    }
                 } else {
                     alert('Failed to reject report');
                 }
@@ -326,14 +362,14 @@ class FloodReliefApp {
     handleHelpRequest(e) {
         e.preventDefault();
 
-        // 1. Auth Check (Must be logged in to track user, per SecurityConfig)
+        // 1. Auth Check
         if (!window.authManager || !window.authManager.isAuthenticated()) {
             alert("You must be logged in to request help.");
             window.location.href = "login.html";
             return;
         }
 
-        // 2. Gather Data from Form
+        // 2. Gather Data
         const name = document.getElementById('help-name').value;
         const phone = document.getElementById('help-phone').value;
         const locationText = document.getElementById('help-location').value;
@@ -343,8 +379,6 @@ class FloodReliefApp {
 
         // 3. Helper to send data
         const submitData = (lat, lng) => {
-            // Combine text location into details since backend needs text there
-            // Backend "details" field will store the user's written location + description + urgency
             const fullDetails = `Location: ${locationText} \nDetails: ${description} \nUrgent: ${isUrgent ? "YES" : "NO"}`;
 
             const payload = {
@@ -352,23 +386,20 @@ class FloodReliefApp {
                 phone: phone,
                 latitude: lat,
                 longitude: lng,
-                needs: [type], // Backend expects a List<String>, so we wrap the single value in an array
+                needs: [type],
                 details: fullDetails
             };
 
-            // CONNECTING TO CORRECT ENDPOINT: HelpRequestController
             fetch('http://localhost:8080/api/help-requests', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include', // Sends session cookie for authentication
+                credentials: 'include',
                 body: JSON.stringify(payload)
             })
                 .then(res => {
-                    if (res.ok) {
-                        return res.json();
-                    }
+                    if (res.ok) return res.json();
                     throw new Error("Failed to submit");
                 })
                 .then(data => {
@@ -381,7 +412,7 @@ class FloodReliefApp {
                 });
         };
 
-        // 4. Get Geolocation (Backend requires double lat/long)
+        // 4. Get Geolocation
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
@@ -389,7 +420,6 @@ class FloodReliefApp {
                 },
                 (err) => {
                     console.warn("Location access denied or failed", err);
-                    // Send 0.0 if location fails, relying on the text description inside 'details'
                     submitData(0.0, 0.0);
                 }
             );

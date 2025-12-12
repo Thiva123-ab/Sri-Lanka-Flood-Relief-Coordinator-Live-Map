@@ -16,25 +16,13 @@ public class MapController {
     @Autowired
     private MapMarkerService mapMarkerService;
 
-    // Public: Only Approved
+    // Public: Only Approved markers
     @GetMapping("/approved")
     public List<MapMarker> getPublicMarkers() {
         return mapMarkerService.getApprovedMarkers();
     }
 
-    // Admin: Pending reports
-    @GetMapping("/pending")
-    public List<MapMarker> getPendingMarkers() {
-        return mapMarkerService.getPendingMarkers();
-    }
-
-    // Admin: Rejected reports
-    @GetMapping("/rejected")
-    public List<MapMarker> getRejectedMarkers() {
-        return mapMarkerService.getRejectedMarkers();
-    }
-
-    // Member: All THEIR OWN reports (Pending, Rejected, Approved)
+    // Member: Get my own reports (so I can see my pending ones on the map)
     @GetMapping("/my-reports")
     public List<MapMarker> getMyReports(Authentication authentication) {
         if (authentication == null) {
@@ -43,9 +31,22 @@ public class MapController {
         return mapMarkerService.getUserMarkers(authentication.getName());
     }
 
+    // Member: Submit a report
     @PostMapping("/report")
     public MapMarker reportIssue(@RequestBody MapMarker marker) {
         return mapMarkerService.reportIssue(marker);
+    }
+
+    // Admin: Get all pending
+    @GetMapping("/pending")
+    public List<MapMarker> getPendingMarkers() {
+        return mapMarkerService.getPendingMarkers();
+    }
+
+    // Admin: Get all rejected
+    @GetMapping("/rejected")
+    public List<MapMarker> getRejectedMarkers() {
+        return mapMarkerService.getRejectedMarkers();
     }
 
     @PutMapping("/{id}/approve")

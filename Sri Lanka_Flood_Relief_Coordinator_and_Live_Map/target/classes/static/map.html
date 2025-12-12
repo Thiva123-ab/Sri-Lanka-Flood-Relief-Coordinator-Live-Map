@@ -6,39 +6,24 @@
   <title>Flood Relief Sri Lanka - Live Map</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
   <style>
-    /* Ensure the modal is centered and scrollable on small screens */
     .modal {
       align-items: center;
       justify-content: center;
-      padding-bottom: 80px; /* Extra space for bottom nav */
+      padding-bottom: 80px;
     }
-
-    /* Override default display behavior to use Flexbox for centering */
     .modal[style*="display: block"] {
       display: flex !important;
     }
-
     .modal-content {
-      margin: 0 !important; /* Remove the old top margin */
-      max-height: 80vh;     /* Limit height to 80% of the screen */
-      overflow-y: auto;     /* Enable internal scrolling */
+      margin: 0 !important;
+      max-height: 80vh;
+      overflow-y: auto;
       width: 90%;
       max-width: 500px;
-    }
-
-    /* Custom Scrollbar styling for the modal */
-    .modal-content::-webkit-scrollbar {
-      width: 8px;
-    }
-    .modal-content::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .modal-content::-webkit-scrollbar-thumb {
-      background: #4CAF50;
-      border-radius: 4px;
     }
   </style>
 </head>
@@ -49,7 +34,7 @@
     <h1>🌊 Flood Relief SL</h1>
   </div>
   <div class="user-info">
-    <span id="user-role">Member</span>
+    <span id="user-role">Guest</span>
     <button id="logout-btn" class="btn btn-secondary">Logout</button>
   </div>
 </header>
@@ -63,30 +48,20 @@
     <i class="fas fa-plus"></i>
   </button>
 
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="map">
-      <i class="fas fa-map-marked-alt"></i>
-      <span>Map</span>
-    </button>
-    <button class="nav-btn" data-tab="reports">
-      <i class="fas fa-exclamation-triangle"></i>
-      <span>Reports</span>
-    </button>
-    <button class="nav-btn" data-tab="alerts">
-      <i class="fas fa-bell"></i>
-      <span>Alerts</span>
-    </button>
-    <button class="nav-btn" data-tab="profile">
-      <i class="fas fa-user"></i>
-      <span>Profile</span>
-    </button>
-  </nav>
-
   <div id="place-modal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
       <h2 id="modal-title">Add Flood Report</h2>
+
       <form id="place-form">
+        <input type="hidden" id="selected-lat" name="lat">
+        <input type="hidden" id="selected-lng" name="lng">
+
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; color: #ccc; text-align: center;">
+          <i class="fas fa-map-pin" style="color: #FFD700;"></i>
+          <span id="location-status">Click on map to select location</span>
+        </div>
+
         <div class="form-group">
           <label for="place-name">Place Name</label>
           <input type="text" id="place-name" placeholder="E.g., Colombo Fort Station" required>
@@ -119,11 +94,24 @@
     </div>
   </div>
 
-  <div id="admin-panel" class="admin-panel" style="display: none;">
-    <h2>Pending Approvals</h2>
-    <div id="pending-reports" class="reports-list">
-    </div>
-  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="map">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>Map</span>
+    </button>
+    <button class="nav-btn" data-tab="reports">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>Reports</span>
+    </button>
+    <button class="nav-btn" data-tab="alerts">
+      <i class="fas fa-bell"></i>
+      <span>Alerts</span>
+    </button>
+    <button class="nav-btn" data-tab="profile">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </button>
+  </nav>
 </main>
 
 <footer class="app-footer">
@@ -132,21 +120,6 @@
       <h2>🌊 Flood Relief SL</h2>
       <p>Protecting Sri Lankan communities from flood risks</p>
     </div>
-    <div class="footer-links">
-      <h3>Quick Links</h3>
-      <ul>
-        <li><a href="index.html">Dashboard</a></li>
-        <li><a href="alerts.html">Alerts</a></li>
-        <li><a href="help.html">Help Request</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="register.html">Register</a></li>
-      </ul>
-    </div>
-    <div class="footer-contact">
-      <h3>Contact Us</h3>
-      <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
-      <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
-    </div>
   </div>
   <div class="footer-bottom">
     <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
@@ -154,6 +127,8 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 <script src="js/auth.js"></script>
 <script src="js/map.js"></script>
 <script src="js/main.js"></script>
