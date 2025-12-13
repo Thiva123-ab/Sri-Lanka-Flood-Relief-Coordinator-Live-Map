@@ -73,11 +73,16 @@ class AuthManager {
         if (this.currentUser) {
             const roleElement = document.getElementById('user-role');
             if (roleElement) {
+                // --- UPDATED: Show Welcome Message with Username ---
+                const username = this.currentUser.username;
+                roleElement.textContent = `Welcome! ${username}`;
+
+                // Update badge style based on role
                 const roleName = this.currentUser.role;
-                const displayRole = roleName.charAt(0).toUpperCase() + roleName.slice(1).toLowerCase();
-                roleElement.textContent = displayRole;
                 roleElement.className = roleName === 'ADMIN' ? 'admin-badge' : 'member-badge';
             }
+
+            // Show Admin Panel if applicable
             if (this.currentUser.role === 'ADMIN') {
                 const adminPanel = document.getElementById('admin-panel');
                 if (adminPanel) adminPanel.style.display = 'block';

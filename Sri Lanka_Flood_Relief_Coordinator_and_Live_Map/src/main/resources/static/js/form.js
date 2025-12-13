@@ -6,6 +6,29 @@ class FormHandler {
 
     init() {
         this.setupFormListeners();
+        this.setupPasswordToggles(); // Initialize password toggle logic
+    }
+
+    setupPasswordToggles() {
+        const toggleIcons = document.querySelectorAll('.toggle-password');
+
+        toggleIcons.forEach(icon => {
+            icon.addEventListener('click', function (e) {
+                // Get the target input ID from data-target attribute
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+
+                if (input) {
+                    // Toggle the type attribute
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+
+                    // Toggle the eye icon class
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                }
+            });
+        });
     }
 
     setupFormListeners() {
