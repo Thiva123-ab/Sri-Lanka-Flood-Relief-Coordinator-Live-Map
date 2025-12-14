@@ -1380,3 +1380,221 @@ body {
     text-align: right;
     margin-top: 4px;
 }
+/* --- WhatsApp Style Chat Layout --- */
+.whatsapp-container {
+    display: flex;
+    height: 100%; /* Fills the main-container */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #1e1e1e; /* Dark theme background */
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+}
+
+@media (min-width: 768px) {
+    .whatsapp-container {
+        border-radius: 20px;
+        margin-top: 20px;
+        height: calc(100vh - 180px);
+    }
+}
+
+/* Sidebar */
+.chat-sidebar {
+    width: 350px;
+    background: #2c3e50; /* Dark sidebar */
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    color: #ddd;
+}
+
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.chat-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.chat-item.active {
+    background: rgba(0, 198, 255, 0.15); /* Highlight active chat */
+    border-left: 4px solid #00c6ff;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    background: #aaa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.chat-info h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.chat-info p {
+    margin: 3px 0 0;
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+/* Main Chat Area */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0f1c2e; /* Darker message bg */
+    position: relative;
+}
+
+.chat-header {
+    padding: 10px 20px;
+    background: #232d3f;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+.chat-title h3 {
+    margin: 0;
+    color: #fff;
+}
+
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Subtle WhatsApp pattern */
+    background-blend-mode: soft-light;
+    background-color: #0d1418;
+}
+
+/* Scrollbar */
+.chat-box::-webkit-scrollbar { width: 6px; }
+.chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+/* Messages */
+.message {
+    max-width: 70%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.message.my-message {
+    align-self: flex-end;
+    background: #005c4b; /* WhatsApp Green Dark Mode */
+    color: #e9edef;
+    border-bottom-right-radius: 0;
+}
+
+.message.other-message {
+    align-self: flex-start;
+    background: #202c33; /* WhatsApp Dark Mode Grey */
+    color: #e9edef;
+    border-bottom-left-radius: 0;
+}
+
+.message-time {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.6);
+    text-align: right;
+    margin-top: 4px;
+}
+
+/* Input Area */
+.message-input-area {
+    padding: 10px 20px;
+    background: #202c33;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.message-input-area input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: none;
+    background: #2a3942;
+    color: white;
+    outline: none;
+    font-size: 1rem;
+}
+
+.message-input-area button {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #00a884;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.message-input-area button:hover {
+    transform: scale(1.1);
+}
+
+.empty-state {
+    text-align: center;
+    color: #667781;
+    margin-top: 20%;
+}
+.empty-state i { font-size: 4rem; margin-bottom: 20px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-sidebar {
+        width: 80px; /* Condensed sidebar */
+    }
+    .chat-info { display: none; }
+    .sidebar-header h3 { display: none; }
+    .chat-item { justify-content: center; padding: 15px 5px; }
+
+    /* When chat is active, maybe hide sidebar? For now keeping both simple */
+}

@@ -1,74 +1,141 @@
 class ChatManager {
     constructor() {
         this.currentUser = null;
+        this.currentPartner = null; // Who are we talking to right now?
         this.chatBox = document.getElementById('chat-box');
+        this.chatList = document.getElementById('chat-list');
         this.init();
     }
 
     init() {
-        // Check Login
         if (!window.authManager || !window.authManager.isAuthenticated()) {
             window.location.href = 'login.html';
             return;
         }
         this.currentUser = window.authManager.getCurrentUser();
 
-        // Bind Events
-        const sendBtn = document.getElementById('send-btn');
-        const inputField = document.getElementById('message-input');
+        // 1. Load the list of people to chat with (Sidebar)
+        this.loadPartners();
 
-        if (sendBtn) sendBtn.addEventListener('click', () => this.sendMessage());
-        if (inputField) {
-            inputField.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') this.sendMessage();
-            });
-        }
+        // 2. Setup Input Listeners
+        document.getElementById('send-btn').addEventListener('click', () => this.sendMessage());
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.sendMessage();
+        });
 
-        // Start Polling
-        this.loadMessages();
-        setInterval(() => this.loadMessages(), 2000); // Poll every 2 seconds
+        // 3. Polling for new messages
+        setInterval(() => {
+            if (this.currentPartner) {
+                this.loadConversation(this.currentPartner, false); // false = don't scroll unless needed
+            }
+            // Optional: refresh partner list occasionally to catch new users
+            // this.loadPartners();
+        }, 3000);
     }
 
-    async loadMessages() {
+    // --- Sidebar Logic ---
+
+    async loadPartners() {
         try {
-            const res = await fetch('http://localhost:8080/api/messages', { credentials: 'include' });
+            const res = await fetch('http://localhost:8080/api/messages/partners', { credentials: 'include' });
             if (res.ok) {
-                const messages = await res.json();
-                this.renderMessages(messages);
+                const partners = await res.json();
+                this.renderSidebar(partners);
+
+                // If member, automatically select ADMIN since they can't talk to anyone else
+                if (this.currentUser.role !== 'ADMIN' && partners.length > 0 && !this.currentPartner) {
+                    this.selectPartner(partners[0]);
+                }
             }
         } catch (err) {
-            console.error("Chat Error:", err);
+            console.error("Error loading partners:", err);
         }
     }
 
-    renderMessages(messages) {
-        // Check if we are at bottom to auto-scroll later
-        const isAtBottom = this.chatBox.scrollHeight - this.chatBox.scrollTop <= this.chatBox.clientHeight + 100;
+    renderSidebar(partners) {
+        this.chatList.innerHTML = '';
 
-        this.chatBox.innerHTML = ''; // Clear and rebuild (Simple approach)
+        if (partners.length === 0) {
+            this.chatList.innerHTML = '<div style="padding:20px; text-align:center; color:#aaa;">No chats yet.</div>';
+            return;
+        }
+
+        partners.forEach(partner => {
+            const div = document.createElement('div');
+            div.className = `chat-item ${this.currentPartner === partner ? 'active' : ''}`;
+            div.onclick = () => this.selectPartner(partner);
+
+            // Generate initial
+            const initial = partner.charAt(0).toUpperCase();
+
+            div.innerHTML = `
+                <div class="avatar">${initial}</div>
+                <div class="chat-info">
+                    <h4>${partner}</h4>
+                    <p>Click to chat</p>
+                </div>
+            `;
+            this.chatList.appendChild(div);
+        });
+    }
+
+    selectPartner(partner) {
+        this.currentPartner = partner;
+
+        // Update UI Header
+        document.getElementById('current-chat-name').textContent = partner;
+        document.getElementById('input-area').style.display = 'flex';
+
+        // Highlight in Sidebar
+        const items = document.querySelectorAll('.chat-item');
+        items.forEach(item => {
+            if(item.innerText.includes(partner)) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+
+        // Load Messages
+        this.loadConversation(partner, true);
+    }
+
+    // --- Message Area Logic ---
+
+    async loadConversation(partner, forceScroll) {
+        try {
+            const res = await fetch(`http://localhost:8080/api/messages/conversation?partner=${partner}`, { credentials: 'include' });
+            if (res.ok) {
+                const messages = await res.json();
+                this.renderMessages(messages, forceScroll);
+            }
+        } catch (err) {
+            console.error("Error loading messages:", err);
+        }
+    }
+
+    renderMessages(messages, forceScroll) {
+        const isAtBottom = this.chatBox.scrollHeight - this.chatBox.scrollTop <= this.chatBox.clientHeight + 150;
+
+        this.chatBox.innerHTML = ''; // Clear
+
+        if (messages.length === 0) {
+            this.chatBox.innerHTML = '<div class="empty-state"><p>No messages yet.</p></div>';
+            return;
+        }
 
         messages.forEach(msg => {
             const isMe = msg.sender === this.currentUser.username;
-            const isAdmin = msg.role === 'ADMIN';
-
             const div = document.createElement('div');
-            div.className = `message ${isMe ? 'my-message' : 'other-message'} ${isAdmin ? 'admin-message' : ''}`;
+            div.className = `message ${isMe ? 'my-message' : 'other-message'}`;
 
-            const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            let senderHtml = `<span class="sender-name">${msg.sender}</span>`;
-            if (isAdmin) senderHtml += `<span class="admin-tag">ADMIN</span>`;
+            const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
             div.innerHTML = `
-                ${!isMe ? `<div class="message-header">${senderHtml}</div>` : ''}
-                <div class="message-content">${msg.content}</div>
+                ${msg.content}
                 <div class="message-time">${time}</div>
             `;
             this.chatBox.appendChild(div);
         });
 
-        // Auto scroll if user was at bottom
-        if (isAtBottom) {
+        if (forceScroll || isAtBottom) {
             this.chatBox.scrollTop = this.chatBox.scrollHeight;
         }
     }
@@ -76,12 +143,12 @@ class ChatManager {
     sendMessage() {
         const input = document.getElementById('message-input');
         const text = input.value.trim();
-
-        if (!text) return;
+        if (!text || !this.currentPartner) return;
 
         const message = {
             sender: this.currentUser.username,
             role: this.currentUser.role,
+            recipient: this.currentPartner, // Crucial for privacy
             content: text
         };
 
@@ -93,7 +160,7 @@ class ChatManager {
         }).then(res => {
             if (res.ok) {
                 input.value = '';
-                this.loadMessages();
+                this.loadConversation(this.currentPartner, true);
             }
         });
     }

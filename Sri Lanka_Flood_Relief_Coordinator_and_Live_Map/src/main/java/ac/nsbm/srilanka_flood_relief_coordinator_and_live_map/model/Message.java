@@ -13,6 +13,7 @@ public class Message {
     private Long id;
 
     private String sender;
+    private String recipient; // Necessary for private 1-on-1 chats
     private String content;
     private String role; // "ADMIN" or "MEMBER"
     private LocalDateTime timestamp;

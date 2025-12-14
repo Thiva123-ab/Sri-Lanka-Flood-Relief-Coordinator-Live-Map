@@ -1380,3 +1380,258 @@ body {
     text-align: right;
     margin-top: 4px;
 }
+/* --- WhatsApp Style Chat Layout (Modern Glassmorphism) --- */
+.whatsapp-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    /* Modern Glass Effect */
+    background: rgba(12, 20, 39, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@media (min-width: 768px) {
+    .whatsapp-container {
+        border-radius: 24px;
+        margin-top: 20px;
+        height: calc(100vh - 180px);
+    }
+}
+
+/* Sidebar */
+.chat-sidebar {
+    width: 350px;
+    /* Slightly darker transparency for depth */
+    background: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    color: #00c6ff; /* Neon Cyan Text */
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
+}
+
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-left: 3px solid transparent;
+}
+
+.chat-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chat-item.active {
+    /* Subtle Cyan Glow for active chat */
+    background: linear-gradient(90deg, rgba(0, 198, 255, 0.15), transparent);
+    border-left: 3px solid #00c6ff;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    /* Gradient Avatar */
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.chat-info h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.chat-info p {
+    margin: 4px 0 0;
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+/* Main Chat Area */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: transparent; /* Let the main glass background show */
+    position: relative;
+}
+
+.chat-header {
+    padding: 10px 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    height: 70px;
+}
+
+.chat-title h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.chat-box {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Removed the WhatsApp image pattern for a cleaner glass look */
+}
+
+/* Custom Scrollbar */
+.chat-box::-webkit-scrollbar, .chat-list::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-box::-webkit-scrollbar-thumb, .chat-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+/* Messages */
+.message {
+    max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 18px;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.message.my-message {
+    align-self: flex-end;
+    /* Gradient matching your blue/cyan theme */
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message.other-message {
+    align-self: flex-start;
+    /* Glassy Grey for received messages */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    color: #e0e0e0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom-left-radius: 4px;
+}
+
+.message-time {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+    margin-top: 5px;
+}
+
+/* Input Area */
+.message-input-area {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.message-input-area input {
+    flex: 1;
+    padding: 15px 25px;
+    border-radius: 50px;
+    /* Glass Input */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.message-input-area input:focus {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: #00c6ff;
+    box-shadow: 0 0 15px rgba(0, 198, 255, 0.2);
+}
+
+.message-input-area button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    /* Gradient Send Button */
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+}
+
+.message-input-area button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
+}
+
+.empty-state {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 20%;
+}
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-sidebar {
+        width: 80px;
+    }
+    .chat-info { display: none; }
+    .sidebar-header h3 { display: none; }
+    .chat-item { justify-content: center; padding: 15px 5px; }
+}
