@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class MessageService {
@@ -16,21 +15,15 @@ public class MessageService {
 
     public Message sendMessage(Message message) {
         message.setTimestamp(LocalDateTime.now());
+        message.setRead(false); // Default to unread
         return messageRepository.save(message);
     }
 
-    /**
-     * Get a list of unique users the current user has chatted with.
-     * For Admin: Returns list of Members.
-     * For Member: Returns only "ADMIN".
-     */
     public List<String> getChatPartners(String currentUser, boolean isAdmin) {
         if (!isAdmin) {
-            // Members only talk to Admin
-            return Collections.singletonList("ADMIN"); // Or whatever your admin username is
+            return Collections.singletonList("ADMIN");
         }
 
-        // Admin sees everyone they have exchanged messages with
         List<Message> allMessages = messageRepository.findAllByOrderByTimestampAsc();
         Set<String> partners = new HashSet<>();
 
@@ -40,13 +33,22 @@ public class MessageService {
                 partners.add(m.getRecipient());
             }
         }
-
-        // Remove 'ADMIN' from the list if it accidentally got in there
         partners.remove(currentUser);
         return new ArrayList<>(partners);
     }
 
     public List<Message> getConversation(String user1, String user2) {
         return messageRepository.findConversation(user1, user2);
+    }
+
+    // --- NEW METHODS ---
+
+    public long getUnreadCount(String username) {
+        return messageRepository.countByRecipientAndIsReadFalse(username);
+    }
+
+    public void markConversationAsRead(String currentUser, String partner) {
+        // Mark messages FROM partner TO currentUser as read
+        messageRepository.markMessagesAsRead(partner, currentUser);
     }
 }

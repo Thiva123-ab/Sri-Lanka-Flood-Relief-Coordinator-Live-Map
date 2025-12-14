@@ -16,7 +16,6 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    // 1. Get List of Chat Partners (for the Sidebar)
     @GetMapping("/partners")
     public List<String> getChatPartners(Authentication authentication) {
         if (authentication == null) return List.of();
@@ -27,19 +26,13 @@ public class MessageController {
         return messageService.getChatPartners(username, isAdmin);
     }
 
-    // 2. Get Messages for a specific conversation
     @GetMapping("/conversation")
     public List<Message> getConversation(@RequestParam String partner, Authentication authentication) {
         if (authentication == null) return List.of();
         String currentUser = authentication.getName();
 
-        // Security: Members can ONLY request chat with ADMIN (or authorized support)
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-
-        // If not admin, force partner to be related to admin logic or strictly validate
-        // For simplicity here: We assume the Service handles strict business logic or we allow it
-        // A strictly private app would verify here that 'partner' is an Admin if currentUser is Member.
+        // --- UPDATE: Mark messages as read when loading conversation ---
+        messageService.markConversationAsRead(currentUser, partner);
 
         return messageService.getConversation(currentUser, partner);
     }
@@ -50,5 +43,12 @@ public class MessageController {
             message.setSender(authentication.getName());
         }
         return messageService.sendMessage(message);
+    }
+
+    // --- NEW ENDPOINT: Poll for global notifications ---
+    @GetMapping("/unread-count")
+    public long getUnreadCount(Authentication authentication) {
+        if (authentication == null) return 0;
+        return messageService.getUnreadCount(authentication.getName());
     }
 }

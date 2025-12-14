@@ -1,4 +1,4 @@
-// Dashboard Manager
+// Dashboard Manager for Landing Page (index.html)
 class DashboardManager {
     constructor() {
         this.init();
@@ -13,6 +13,9 @@ class DashboardManager {
 
         // Initialize animations
         this.initAnimations();
+
+        // --- NEW: Load Live Statistics ---
+        this.loadStats();
     }
 
     checkAuthStatus() {
@@ -23,9 +26,7 @@ class DashboardManager {
             const loginButton = document.getElementById('login-btn');
 
             if (roleElement && loginButton) {
-                // --- UPDATED: Show Welcome Message with Username ---
                 roleElement.textContent = `Welcome! ${user.username}`;
-
                 // Handle casing for role check (ADMIN vs admin)
                 const isAdmin = user.role === 'ADMIN' || user.role === 'admin';
                 roleElement.className = isAdmin ? 'admin-badge' : 'member-badge';
@@ -88,18 +89,14 @@ class DashboardManager {
     }
 
     changeLanguage(lang) {
-        // Update active button
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.classList.remove('active');
         });
         document.getElementById(`lang-${lang}`).classList.add('active');
-
-        // In a real app, this would update all text content
         console.log(`Language changed to: ${lang}`);
     }
 
     initAnimations() {
-        // Add entrance animations to elements
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -108,14 +105,59 @@ class DashboardManager {
             });
         }, { threshold: 0.1 });
 
-        // Observe sections
         document.querySelectorAll('section').forEach(section => {
             observer.observe(section);
         });
     }
+
+    // --- NEW: Live Data Connection ---
+    loadStats() {
+        // 1. Fetch Locations (Approved Markers)
+        // Endpoint: /api/markers/approved
+        fetch('http://localhost:8080/api/markers/approved')
+            .then(res => res.json())
+            .then(data => {
+                const count = data.length;
+                this.animateValue("locations-count", 0, count, 2000);
+
+                // Derive Communities: (Mock logic: 1 community per ~5 unique reports)
+                const communities = Math.max(Math.floor(count / 5), 1);
+                this.animateValue("communities-count", 0, communities, 2000);
+
+                // Derive Rescues: (Mock logic: 1 rescue per ~3 reports)
+                // Note: Real help requests are private, so we use a proxy for the public page.
+                const rescues = Math.max(Math.floor(count / 3), 1);
+                this.animateValue("rescues-count", 0, rescues, 2000);
+            })
+            .catch(err => console.error("Failed to load map stats", err));
+
+        // 2. Fetch Alerts
+        // Endpoint: /api/alerts
+        fetch('http://localhost:8080/api/alerts')
+            .then(res => res.json())
+            .then(data => {
+                this.animateValue("alerts-count", 0, data.length, 2000);
+            })
+            .catch(err => console.error("Failed to load alerts", err));
+    }
+
+    // Number Counter Animation
+    animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start) + "+";
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboardManager = new DashboardManager();
 });

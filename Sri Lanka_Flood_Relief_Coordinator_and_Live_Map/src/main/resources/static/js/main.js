@@ -11,6 +11,12 @@ class FloodReliefApp {
     init() {
         this.setupEventListeners();
 
+        // --- NEW: Start Notification Poller ---
+        // Checks for unread messages if the user is logged in
+        if (window.authManager && window.authManager.isAuthenticated()) {
+            this.startNotificationService();
+        }
+
         const path = window.location.pathname;
 
         // On Map Page: If Admin, load the pending sidebar
@@ -27,6 +33,49 @@ class FloodReliefApp {
             this.loadPublicReports();
         }
     }
+
+    // --- NOTIFICATION SYSTEM START ---
+
+    startNotificationService() {
+        // Check immediately upon load
+        this.checkUnreadMessages();
+        // Then check every 3 seconds
+        setInterval(() => this.checkUnreadMessages(), 3000);
+    }
+
+    checkUnreadMessages() {
+        fetch('http://localhost:8080/api/messages/unread-count', { credentials: 'include' })
+            .then(res => {
+                if(res.ok) return res.json();
+                return 0;
+            })
+            .then(count => {
+                this.updateChatBadge(count);
+            })
+            .catch(err => console.error("Notification poll error:", err));
+    }
+
+    updateChatBadge(count) {
+        // Find the Chat button in the bottom nav
+        // We look for the button that links to chat.html
+        const chatBtns = document.querySelectorAll('.nav-btn[onclick*="chat.html"]');
+
+        chatBtns.forEach(btn => {
+            // Remove existing badge if it exists
+            const existingBadge = btn.querySelector('.notification-badge');
+            if (existingBadge) existingBadge.remove();
+
+            // If count > 0, add new badge
+            if (count > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'notification-badge';
+                badge.innerText = count > 99 ? '99+' : count;
+                btn.appendChild(badge);
+            }
+        });
+    }
+
+    // --- NOTIFICATION SYSTEM END ---
 
     setupEventListeners() {
         const fab = document.getElementById('fab');
@@ -80,7 +129,7 @@ class FloodReliefApp {
         // 3. Reset the visual status text
         const statusSpan = document.getElementById('location-status');
         if(statusSpan) {
-            statusSpan.innerHTML = "Using Device GPS (Click map to change)";
+            statusSpan.innerHTML = "Using Device GPS (Click map to select)";
             statusSpan.style.color = "#ccc";
         }
     }

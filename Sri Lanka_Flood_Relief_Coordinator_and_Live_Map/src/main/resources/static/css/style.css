@@ -1635,3 +1635,34 @@ body {
     .sidebar-header h3 { display: none; }
     .chat-item { justify-content: center; padding: 15px 5px; }
 }
+/* Add this to your style.css */
+
+/* Navigation Button Relative Positioning */
+.nav-btn {
+    position: relative; /* Essential for absolute positioning of badge */
+}
+
+/* Notification Badge Style */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: 5px; /* Adjust based on icon alignment */
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.3);
+    animation: bounceBadge 0.5s ease-out;
+    z-index: 10;
+}
+
+@keyframes bounceBadge {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
