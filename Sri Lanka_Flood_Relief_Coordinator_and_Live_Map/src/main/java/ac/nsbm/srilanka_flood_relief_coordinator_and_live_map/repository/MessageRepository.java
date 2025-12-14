@@ -18,9 +18,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE m.sender = :user OR m.recipient = :user")
     List<Message> findAllMessagesByUser(String user);
 
-    List<Message> findAllByOrderByTimestampAsc();
-
-    // --- NEW: Used to sort chats by most recent activity ---
+    // Used to sort chats by most recent activity
     List<Message> findAllByOrderByTimestampDesc();
 
     long countByRecipientAndIsReadFalse(String recipient);

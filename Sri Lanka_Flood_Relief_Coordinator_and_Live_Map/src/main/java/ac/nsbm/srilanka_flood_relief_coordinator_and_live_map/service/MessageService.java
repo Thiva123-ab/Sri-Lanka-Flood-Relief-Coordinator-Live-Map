@@ -31,16 +31,17 @@ public class MessageService {
         }
 
         // For Admin: Get all messages sorted NEWEST first
+        // This ensures the partners who sent/received messages recently appear first
         List<Message> messages = messageRepository.findAllByOrderByTimestampDesc();
 
-        // Use LinkedHashSet to preserve order (Most recent partners first)
+        // Use LinkedHashSet to preserve insertion order (Most recent partners first)
         Set<String> uniquePartners = new LinkedHashSet<>();
         Map<String, Integer> unreadMap = new HashMap<>();
 
         for (Message m : messages) {
             String partner = null;
 
-            // Identify the other party
+            // Identify the conversation partner
             if (m.getSender().equals(currentUser)) {
                 partner = m.getRecipient();
             } else if (m.getRecipient() != null && m.getRecipient().equals(currentUser)) {
@@ -56,7 +57,7 @@ public class MessageService {
             }
         }
 
-        // Build the result list
+        // Build the result list from the sorted set
         List<Map<String, Object>> result = new ArrayList<>();
         for (String name : uniquePartners) {
             Map<String, Object> entry = new HashMap<>();
