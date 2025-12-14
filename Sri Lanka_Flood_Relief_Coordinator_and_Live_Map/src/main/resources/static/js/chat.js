@@ -1,7 +1,7 @@
 class ChatManager {
     constructor() {
         this.currentUser = null;
-        this.currentPartner = null; // Who are we talking to right now?
+        this.currentPartner = null;
         this.chatBox = document.getElementById('chat-box');
         this.chatList = document.getElementById('chat-list');
         this.init();
@@ -14,22 +14,21 @@ class ChatManager {
         }
         this.currentUser = window.authManager.getCurrentUser();
 
-        // 1. Load the list of people to chat with (Sidebar)
         this.loadPartners();
 
-        // 2. Setup Input Listeners
         document.getElementById('send-btn').addEventListener('click', () => this.sendMessage());
         document.getElementById('message-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.sendMessage();
         });
 
-        // 3. Polling for new messages
+        // Poll for updates (Messages AND Sidebar Order)
         setInterval(() => {
+            // Refresh conversation if open
             if (this.currentPartner) {
-                this.loadConversation(this.currentPartner, false); // false = don't scroll unless needed
+                this.loadConversation(this.currentPartner, false);
             }
-            // Optional: refresh partner list occasionally to catch new users
-            // this.loadPartners();
+            // Refresh sidebar to reorder chats and update badges
+            this.loadPartners();
         }, 3000);
     }
 
@@ -42,9 +41,9 @@ class ChatManager {
                 const partners = await res.json();
                 this.renderSidebar(partners);
 
-                // If member, automatically select ADMIN since they can't talk to anyone else
+                // Auto-select first partner if none selected (for Members)
                 if (this.currentUser.role !== 'ADMIN' && partners.length > 0 && !this.currentPartner) {
-                    this.selectPartner(partners[0]);
+                    this.selectPartner(partners[0].name);
                 }
             }
         } catch (err) {
@@ -53,6 +52,8 @@ class ChatManager {
     }
 
     renderSidebar(partners) {
+        // Don't wipe HTML if it's just a refresh, to prevent flicker?
+        // For simplicity, we rebuild. The browser handles small DOM updates fast enough.
         this.chatList.innerHTML = '';
 
         if (partners.length === 0) {
@@ -60,57 +61,68 @@ class ChatManager {
             return;
         }
 
-        partners.forEach(partner => {
-            const div = document.createElement('div');
-            div.className = `chat-item ${this.currentPartner === partner ? 'active' : ''}`;
-            div.onclick = () => this.selectPartner(partner);
+        partners.forEach(partnerObj => {
+            const name = partnerObj.name;
+            const unread = partnerObj.unread || 0;
 
-            // Generate initial
-            const initial = partner.charAt(0).toUpperCase();
+            const div = document.createElement('div');
+            // If this partner is selected, add active class
+            div.className = `chat-item ${this.currentPartner === name ? 'active' : ''}`;
+            div.onclick = () => this.selectPartner(name);
+
+            const initial = name.charAt(0).toUpperCase();
+
+            // Notification Badge HTML
+            const badgeHtml = unread > 0
+                ? `<span style="background: #ff4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; margin-left: auto;">${unread}</span>`
+                : '';
 
             div.innerHTML = `
                 <div class="avatar">${initial}</div>
-                <div class="chat-info">
-                    <h4>${partner}</h4>
-                    <p>Click to chat</p>
+                <div class="chat-info" style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 style="margin:0;">${name}</h4>
+                        ${badgeHtml}
+                    </div>
+                    <p style="margin:4px 0 0; color:#aaa; font-size:0.8rem;">Click to chat</p>
                 </div>
             `;
             this.chatList.appendChild(div);
         });
     }
 
-    selectPartner(partner) {
-        this.currentPartner = partner;
+    selectPartner(partnerName) {
+        this.currentPartner = partnerName;
 
-        // Update UI Header
-        document.getElementById('current-chat-name').textContent = partner;
+        document.getElementById('current-chat-name').textContent = partnerName;
         document.getElementById('input-area').style.display = 'flex';
 
-        // Highlight in Sidebar
+        // Manually update active class immediately for visual feedback
         const items = document.querySelectorAll('.chat-item');
         items.forEach(item => {
-            if(item.innerText.includes(partner)) item.classList.add('active');
+            // Simple text check or class check
+            if(item.innerHTML.includes(`<h4>${partnerName}</h4>`)) item.classList.add('active');
             else item.classList.remove('active');
         });
 
         // Load Messages
-        this.loadConversation(partner, true);
+        this.loadConversation(partnerName, true);
+
+        // Refresh sidebar immediately to clear the badge
+        setTimeout(() => this.loadPartners(), 500);
     }
 
     // --- Message Area Logic ---
 
     async loadConversation(partner, forceScroll) {
         try {
-            // Note: The backend 'getConversation' endpoint marks messages as read automatically
             const res = await fetch(`http://localhost:8080/api/messages/conversation?partner=${partner}`, { credentials: 'include' });
             if (res.ok) {
                 const messages = await res.json();
                 this.renderMessages(messages, forceScroll);
 
-                // --- FIX: Force update badge immediately after reading ---
-                if (window.floodApp) {
-                    window.floodApp.checkUnreadMessages();
-                }
+                // Force global badge update
+                if(window.floodApp) window.floodApp.checkUnreadMessages();
             }
         } catch (err) {
             console.error("Error loading messages:", err);
@@ -120,7 +132,7 @@ class ChatManager {
     renderMessages(messages, forceScroll) {
         const isAtBottom = this.chatBox.scrollHeight - this.chatBox.scrollTop <= this.chatBox.clientHeight + 150;
 
-        this.chatBox.innerHTML = ''; // Clear
+        this.chatBox.innerHTML = '';
 
         if (messages.length === 0) {
             this.chatBox.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet.</p></div>';
@@ -154,7 +166,7 @@ class ChatManager {
         const message = {
             sender: this.currentUser.username,
             role: this.currentUser.role,
-            recipient: this.currentPartner, // Crucial for privacy
+            recipient: this.currentPartner,
             content: text
         };
 
@@ -167,6 +179,8 @@ class ChatManager {
             if (res.ok) {
                 input.value = '';
                 this.loadConversation(this.currentPartner, true);
+                // Also refresh sidebar to move this chat to top
+                this.loadPartners();
             }
         });
     }

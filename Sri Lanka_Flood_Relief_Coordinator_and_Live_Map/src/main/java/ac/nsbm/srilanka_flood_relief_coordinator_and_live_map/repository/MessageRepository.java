@@ -2,9 +2,9 @@ package ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.repository;
 
 import ac.nsbm.srilanka_flood_relief_coordinator_and_live_map.model.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying; // Import this
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional; // Import this
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
@@ -20,12 +20,11 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findAllByOrderByTimestampAsc();
 
-    // --- NEW METHODS ---
+    // --- NEW: Used to sort chats by most recent activity ---
+    List<Message> findAllByOrderByTimestampDesc();
 
-    // Count unread messages for the current user (recipient)
     long countByRecipientAndIsReadFalse(String recipient);
 
-    // Mark messages sent BY the partner TO the current user as read
     @Modifying
     @Transactional
     @Query("UPDATE Message m SET m.isRead = true WHERE m.sender = :partner AND m.recipient = :currentUser")

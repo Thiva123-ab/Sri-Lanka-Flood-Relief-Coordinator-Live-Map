@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/messages")
@@ -16,8 +17,9 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
+    // --- UPDATED RETURN TYPE ---
     @GetMapping("/partners")
-    public List<String> getChatPartners(Authentication authentication) {
+    public List<Map<String, Object>> getChatPartners(Authentication authentication) {
         if (authentication == null) return List.of();
         String username = authentication.getName();
         boolean isAdmin = authentication.getAuthorities().stream()
@@ -31,7 +33,6 @@ public class MessageController {
         if (authentication == null) return List.of();
         String currentUser = authentication.getName();
 
-        // --- UPDATE: Mark messages as read when loading conversation ---
         messageService.markConversationAsRead(currentUser, partner);
 
         return messageService.getConversation(currentUser, partner);
@@ -45,7 +46,6 @@ public class MessageController {
         return messageService.sendMessage(message);
     }
 
-    // --- NEW ENDPOINT: Poll for global notifications ---
     @GetMapping("/unread-count")
     public long getUnreadCount(Authentication authentication) {
         if (authentication == null) return 0;
