@@ -17,7 +17,7 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    // --- UPDATED RETURN TYPE to Map to support {name: "User", unread: 5} ---
+    // --- UPDATED RETURN TYPE ---
     @GetMapping("/partners")
     public List<Map<String, Object>> getChatPartners(Authentication authentication) {
         if (authentication == null) return List.of();
@@ -33,7 +33,6 @@ public class MessageController {
         if (authentication == null) return List.of();
         String currentUser = authentication.getName();
 
-        // Mark messages as read when fetched
         messageService.markConversationAsRead(currentUser, partner);
 
         return messageService.getConversation(currentUser, partner);
