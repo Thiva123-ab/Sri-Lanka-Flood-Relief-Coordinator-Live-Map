@@ -40,6 +40,7 @@ class MapController {
         });
     }
 
+    // --- FIX: Use Custom Icon for Temp Marker to ensure correct anchoring ---
     handleMapClick(e) {
         const { lat, lng } = e.latlng;
 
@@ -48,15 +49,17 @@ class MapController {
             this.map.removeLayer(this.tempMarker);
         }
 
-        // Add Blue Temp Pin
-        this.tempMarker = L.marker([lat, lng]).addTo(this.map);
+        // Create a Blue "Selection" Pin using your CSS styles
+        const tempIcon = this.createCustomIcon('fa-map-pin', '#2196F3', true);
+
+        this.tempMarker = L.marker([lat, lng], { icon: tempIcon }).addTo(this.map);
 
         // Bind popup with button
         this.tempMarker.bindPopup(`
             <div style="text-align:center; padding: 5px;">
                 <b style="color: #333;">Selected Location</b><br>
                 <div style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">
-                    ${lat.toFixed(4)}, ${lng.toFixed(4)}
+                    ${lat.toFixed(5)}, ${lng.toFixed(5)}
                 </div>
                 <button onclick="document.getElementById('fab').click()" 
                         style="background:#4CAF50; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">
@@ -76,7 +79,7 @@ class MapController {
         }
 
         if (statusSpan) {
-            statusSpan.innerHTML = `<i class="fas fa-check-circle" style="color:#4CAF50;"></i> Pin Dropped (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+            statusSpan.innerHTML = `<i class="fas fa-check-circle" style="color:#4CAF50;"></i> Location Selected`;
             statusSpan.style.color = '#4CAF50';
         }
     }
@@ -93,12 +96,11 @@ class MapController {
     loadMapData() {
         this.clearMarkers();
 
-        // 1. Fetch Public Approved Markers (Full URL)
+        // 1. Fetch Public Approved Markers
         fetch('http://localhost:8080/api/markers/approved')
             .then(res => res.json())
             .then(data => {
-                data.forEach(place => this.addMarker(place, false)); // false = not pending
-                console.log(`Loaded ${data.length} approved markers.`);
+                data.forEach(place => this.addMarker(place, false));
             })
             .catch(err => console.error("Error loading approved markers:", err));
 
@@ -107,9 +109,8 @@ class MapController {
             fetch('http://localhost:8080/api/markers/my-reports', { credentials: 'include' })
                 .then(res => res.json())
                 .then(data => {
-                    // Filter pending only (Approved ones are fetched above)
                     const pending = data.filter(m => m.status && m.status.toLowerCase() === 'pending');
-                    pending.forEach(place => this.addMarker(place, true)); // true = is pending
+                    pending.forEach(place => this.addMarker(place, true));
                 })
                 .catch(err => console.error("Error loading my reports:", err));
         }
@@ -117,27 +118,12 @@ class MapController {
 
     addMarker(place, isPending = false) {
         const config = this.getMarkerConfig(place.type);
-
-        // Styling for Pending vs Approved
-        const opacity = isPending ? 0.6 : 1.0;
-        const statusBadge = isPending ? '<br><span style="background:orange; color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold;">PENDING APPROVAL</span>' : '';
-
-        // Custom Icon
-        const markerIcon = L.divIcon({
-            className: `custom-marker-container`,
-            html: `
-                <div class="marker-pin" style="background-color: ${config.color}; opacity: ${opacity}; transform: rotate(-45deg);">
-                    <i class="fas ${config.icon}" style="transform: rotate(45deg); color: white; font-size: 14px;"></i>
-                </div>
-                <div class="marker-pulse" style="border-color: ${config.color};"></div>
-            `,
-            iconSize: [30, 42],
-            iconAnchor: [15, 42],
-            popupAnchor: [0, -35]
-        });
+        const markerIcon = this.createCustomIcon(config.icon, config.color, false, isPending);
 
         const marker = L.marker([place.lat, place.lng], { icon: markerIcon }).addTo(this.map);
 
+        // Status Badge for Popup
+        const statusBadge = isPending ? '<br><span style="background:orange; color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem; font-weight:bold;">PENDING APPROVAL</span>' : '';
         let timeStr = "Recently";
         if (place.timestamp) {
             const date = new Date(place.timestamp);
@@ -171,6 +157,28 @@ class MapController {
         this.markers.push({ id: place.id, marker: marker, data: place });
     }
 
+    // --- HELPER: Centralized Icon Creation ---
+    createCustomIcon(iconClass, color, isPulse = false, isPending = false) {
+        // Opacity for pending reports
+        const opacity = isPending ? 0.6 : 1.0;
+
+        // Remove 'fa-' if passed, to normalize
+        const icon = iconClass.startsWith('fa-') ? iconClass : `fa-${iconClass}`;
+
+        return L.divIcon({
+            className: 'custom-marker-container',
+            html: `
+                <div class="marker-pin" style="background-color: ${color}; opacity: ${opacity}; transform: rotate(-45deg);">
+                    <i class="fas ${icon}" style="transform: rotate(45deg); color: white; font-size: 14px;"></i>
+                </div>
+                ${isPulse ? `<div class="marker-pulse" style="border-color: ${color};"></div>` : ''}
+            `,
+            iconSize: [30, 42],
+            iconAnchor: [15, 42], // Correct anchor: Horizontal Center (15), Bottom (42)
+            popupAnchor: [0, -35]
+        });
+    }
+
     getMarkerConfig(type) {
         switch (type) {
             case 'flood': return { icon: 'fa-water', color: '#2196F3' };
@@ -196,16 +204,11 @@ class MapController {
     locateUser() {
         this.map.locate({ setView: false, maxZoom: 16 });
         this.map.on('locationfound', (e) => {
-            L.circleMarker(e.latlng, {
-                radius: 8,
-                fillColor: "#4285F4",
-                color: "#fff",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(this.map).bindPopup('You are here');
+            // Optional: Draw a circle for user accuracy
+            // L.circleMarker(...)
 
-            // Only center if user hasn't clicked a pin yet
+            // NOTE: We do NOT set tempMarker here automatically to avoid confusion.
+            // Users must click to set the pin.
             if (!this.tempMarker) this.map.setView(e.latlng, 13);
         });
     }

@@ -1666,3 +1666,15 @@ body {
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
+/* Add this at the end of style.css */
+
+/* Fix for Leaflet Custom Icon Container */
+.custom-marker-container {
+    background: transparent;
+    border: none;
+}
+
+/* Ensure the pin aligns correctly */
+.marker-pin {
+    box-sizing: border-box; /* Ensure borders don't add size unexpectedly */
+}

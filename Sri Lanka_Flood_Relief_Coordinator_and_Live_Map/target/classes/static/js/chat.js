@@ -101,10 +101,16 @@ class ChatManager {
 
     async loadConversation(partner, forceScroll) {
         try {
+            // Note: The backend 'getConversation' endpoint marks messages as read automatically
             const res = await fetch(`http://localhost:8080/api/messages/conversation?partner=${partner}`, { credentials: 'include' });
             if (res.ok) {
                 const messages = await res.json();
                 this.renderMessages(messages, forceScroll);
+
+                // --- FIX: Force update badge immediately after reading ---
+                if (window.floodApp) {
+                    window.floodApp.checkUnreadMessages();
+                }
             }
         } catch (err) {
             console.error("Error loading messages:", err);
@@ -117,7 +123,7 @@ class ChatManager {
         this.chatBox.innerHTML = ''; // Clear
 
         if (messages.length === 0) {
-            this.chatBox.innerHTML = '<div class="empty-state"><p>No messages yet.</p></div>';
+            this.chatBox.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet.</p></div>';
             return;
         }
 

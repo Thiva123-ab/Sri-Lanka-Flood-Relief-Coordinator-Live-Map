@@ -98,11 +98,14 @@ class FloodReliefApp {
         const helpForm = document.getElementById('help-form');
         if (helpForm) helpForm.addEventListener('submit', (e) => this.handleHelpRequest(e));
 
+        // Note: Alerts/Navigation is also handled in alerts.js but this is for general pages
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const tab = e.currentTarget.dataset.tab;
-                this.switchTab(tab);
+                if(e.currentTarget.dataset.tab) {
+                    const tab = e.currentTarget.dataset.tab;
+                    this.switchTab(tab);
+                }
             });
         });
     }
@@ -223,7 +226,7 @@ class FloodReliefApp {
             });
     }
 
-    // --- Admin/Pending Report Logic (Corrected Details) ---
+    // --- Admin/Pending Report Logic ---
 
     loadPendingReports() {
         const container = document.getElementById('pending-reports');
