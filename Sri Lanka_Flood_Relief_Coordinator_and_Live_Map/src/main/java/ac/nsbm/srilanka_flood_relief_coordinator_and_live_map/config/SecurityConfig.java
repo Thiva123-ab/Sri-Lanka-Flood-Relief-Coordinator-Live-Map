@@ -28,6 +28,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // FIX: Allow CORS from everywhere for development
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOriginPatterns(List.of("*"));
@@ -43,24 +44,24 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public Endpoints
                         .requestMatchers("/", "/index.html", "/login.html", "/register.html",
-                                "/css/**", "/js/**", "/images/**").permitAll()
+                                "/css/**", "/js/**", "/images/**", "/chat.html").permitAll() // Added chat.html
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/markers/approved").permitAll()
                         .requestMatchers("/api/alerts").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Admin Only Actions (Approve/Reject must remain restricted)
+                        // Admin Only
                         .requestMatchers("/admin.html").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
                         .requestMatchers("/api/reports").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
-                        .requestMatchers("/api/markers/*/approve",
-                                "/api/markers/*/reject").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                        .requestMatchers("/api/markers/*/approve", "/api/markers/*/reject").hasAnyAuthority("ADMIN", "ROLE_ADMIN")
 
-                        // Authenticated Endpoints (Members & Admins)
-                        // UPDATED: 'pending' moved here so logged-in members can fetch their own reports
+                        // Authenticated Endpoints
                         .requestMatchers("/api/markers/pending").authenticated()
                         .requestMatchers("/api/reports/upload").authenticated()
                         .requestMatchers("/api/help-requests").authenticated()
                         .requestMatchers("/api/markers/report").authenticated()
+                        // Allow Chat Messages
+                        .requestMatchers("/api/messages/**").authenticated()
 
                         .anyRequest().authenticated()
                 )

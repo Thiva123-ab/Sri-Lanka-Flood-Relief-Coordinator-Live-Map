@@ -23,8 +23,13 @@ class DashboardManager {
             const loginButton = document.getElementById('login-btn');
 
             if (roleElement && loginButton) {
-                roleElement.textContent = user.role === 'admin' ? 'Admin' : 'Member';
-                roleElement.className = user.role === 'admin' ? 'admin-badge' : 'member-badge';
+                // --- UPDATED: Show Welcome Message with Username ---
+                roleElement.textContent = `Welcome! ${user.username}`;
+
+                // Handle casing for role check (ADMIN vs admin)
+                const isAdmin = user.role === 'ADMIN' || user.role === 'admin';
+                roleElement.className = isAdmin ? 'admin-badge' : 'member-badge';
+
                 loginButton.textContent = 'Logout';
                 loginButton.onclick = () => this.logout();
             }

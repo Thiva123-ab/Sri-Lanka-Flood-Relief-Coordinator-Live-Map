@@ -1253,3 +1253,130 @@ body {
     margin-left: -15px;
     transform: rotateX(55deg);
 }
+/* --- Chat System Styles --- */
+.chat-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    height: calc(100vh - 160px);
+    display: flex;
+    flex-direction: column;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.chat-box {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scrollbar for chat */
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-box::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.message-input-area {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 0 0 20px 20px;
+    display: flex;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
+}
+
+.message-input-area input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+}
+
+.message-input-area button {
+    width: auto;
+    padding: 0 25px;
+    border-radius: 25px;
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.message-input-area button:hover {
+    transform: scale(1.05);
+}
+
+/* Message Bubbles */
+.message {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message.my-message {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #00b09b, #96c93d);
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+
+.message.other-message {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-bottom-left-radius: 2px;
+}
+
+.message.admin-message {
+    border: 1px solid #FFD700; /* Gold border for Admins */
+}
+
+.message-header {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    opacity: 0.8;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sender-name {
+    font-weight: bold;
+}
+
+.admin-tag {
+    background: #FFD700;
+    color: #000;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    text-align: right;
+    margin-top: 4px;
+}
