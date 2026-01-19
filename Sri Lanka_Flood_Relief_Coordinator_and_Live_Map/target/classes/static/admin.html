@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Flood Relief Sri Lanka</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* Ensure the modal is centered and scrollable on small screens */
+    .modal {
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 80px; /* Extra space for bottom nav */
+    }
+
+    /* Override default display behavior to use Flexbox for centering */
+    .modal[style*="display: block"] {
+      display: flex !important;
+    }
+
+    .modal-content {
+      margin: 0 !important; /* Remove the old top margin */
+      max-height: 80vh;     /* Limit height to 80% of the screen */
+      overflow-y: auto;     /* Enable internal scrolling */
+      width: 90%;
+      max-width: 500px;
+    }
+
+    /* Custom Scrollbar styling for the modal */
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #4CAF50;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <h1>🌊 Flood Relief SL</h1>
+  </div>
+  <div class="user-info">
+    <span id="user-role">Admin</span>
+    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+  </div>
+</header>
+
+<main class="main-container">
+  <div class="admin-dashboard">
+    <h1>Administrator Dashboard</h1>
+
+    <div style="text-align: right; margin-bottom: 25px;">
+      <a href="analysis.html"
+         class="btn"
+         style="text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                width: auto;
+                padding: 12px 35px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-radius: 50px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;">
+        <i class="fas fa-chart-pie" style="font-size: 1.1rem;"></i>
+        VIEW ANALYTICS & REPORTS
+      </a>
+    </div>
+
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3><i class="fas fa-exclamation-triangle"></i> Pending Reports</h3>
+        <p id="pending-count">0</p>
+      </div>
+      <div class="stat-card">
+        <h3><i class="fas fa-check-circle"></i> Approved Reports</h3>
+        <p id="approved-count">0</p>
+      </div>
+      <div class="stat-card" style="border-left: 4px solid #dc3545;">
+        <h3><i class="fas fa-times-circle" style="color: rgb(6,248,15);"></i> Rejected Reports</h3>
+        <p id="rejected-count" style="color: rgba(237,226,13,0.8);">0</p>
+      </div>
+      <div class="stat-card">
+        <h3><i class="fas fa-bell"></i> Active Alerts</h3>
+        <p id="alerts-count">0</p>
+      </div>
+    </div>
+
+    <div class="admin-sections">
+
+      <div class="section">
+        <h2>Emergency Help Requests</h2>
+        <div id="help-requests-list" class="reports-list">
+          <p style="text-align: center; color: #ccc;">Loading requests...</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Pending Location Reports</h2>
+        <div id="pending-reports" class="reports-list">
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 style="color: #fa071f; border-bottom-color: #ff4f60;">Rejected Reports</h2>
+        <div id="rejected-reports" class="reports-list">
+          <p style="text-align: center; color: #ccc;">No rejected reports.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Manage Alerts</h2>
+        <button id="add-alert-btn" class="btn btn-primary">Create New Alert</button>
+        <div id="alerts-list" class="alerts-list">
+        </div>
+      </div>
+    </div>
+
+    <div id="alert-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Create New Alert</h2>
+        <form id="alert-form">
+          <div class="form-group">
+            <label for="alert-title-en">Title</label>
+            <input type="text" id="alert-title-en" placeholder="Enter alert title" required>
+          </div>
+
+          <div class="form-group">
+            <label for="alert-description-en">Description</label>
+            <textarea id="alert-description-en" rows="4" placeholder="Enter alert details..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="alert-level">Alert Level</label>
+            <select id="alert-level" required>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="alert-location">Location</label>
+            <input type="text" id="alert-location" placeholder="Affected area (e.g., Western Province)" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Create Alert</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn" data-tab="map">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>Map</span>
+    </button>
+    <button class="nav-btn" data-tab="reports">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>Reports</span>
+    </button>
+    <button class="nav-btn" data-tab="alerts">
+      <i class="fas fa-bell"></i>
+      <span>Alerts</span>
+    </button>
+    <button class="nav-btn" onclick="location.href='chat.html'">
+      <i class="fas fa-comments"></i>
+      <span>Chat</span>
+    </button>
+    <button class="nav-btn active" data-tab="profile">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </button>
+  </nav>
+</main>
+
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+      <h2>🌊 Flood Relief SL</h2>
+      <p>Protecting Sri Lankan communities from flood risks</p>
+    </div>
+    <div class="footer-links">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="map.html">Live Map</a></li>
+        <li><a href="alerts.html">Alerts</a></li>
+        <li><a href="help.html">Help Request</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html">Register</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h3>Contact Us</h3>
+      <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
+      <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

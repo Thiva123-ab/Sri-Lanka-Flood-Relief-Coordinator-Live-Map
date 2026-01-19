@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Reports - Flood Relief Sri Lanka</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="logo">
+        <h1>🌊 Flood Relief SL</h1>
+    </div>
+    <div class="user-info">
+        <span id="user-role">Admin</span>
+        <button id="logout-btn" class="btn btn-secondary">Logout</button>
+    </div>
+</header>
+
+<main class="main-container">
+    <div class="admin-dashboard">
+        <h1>Situation Analysis & Reports</h1>
+        <p style="text-align: center; color: #ddd; margin-bottom: 20px;">
+            <a href="admin.html" style="color: #4CAF50;">&larr; Back to Dashboard</a>
+        </p>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3><i class="fas fa-map-marker-alt"></i> Total Incidents</h3>
+                <p id="total-incidents">0</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-hands-helping"></i> Help Requests</h3>
+                <p id="total-requests">0</p>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-exclamation-circle"></i> High Risk Areas</h3>
+                <p id="high-risk-count">0</p>
+            </div>
+        </div>
+
+        <div class="admin-sections">
+            <div class="section">
+                <h2>Live Statistics</h2>
+                <div class="charts-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+                    <div class="chart-box" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; flex: 1; min-width: 300px;">
+                        <h3 style="text-align: center; color: #FFD700; margin-bottom: 15px;">Incident Types</h3>
+                        <canvas id="incidentChart"></canvas>
+                    </div>
+                    <div class="chart-box" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; flex: 1; min-width: 300px;">
+                        <h3 style="text-align: center; color: #FFD700; margin-bottom: 15px;">Help Needs Analysis</h3>
+                        <canvas id="needsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Download Reports</h2>
+                <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; text-align: center;">
+                    <p style="margin-bottom: 20px; color: #eee;">Generate a comprehensive PDF report including all verified incidents, active help requests, and current statistics.</p>
+                    <button id="download-pdf-btn" class="btn btn-primary" style="font-size: 1.1rem; padding: 15px 40px;">
+                        <i class="fas fa-file-pdf"></i> Download Full Situation Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <h2>🌊 Flood Relief SL</h2>
+            <p>Protecting Sri Lankan communities from flood risks</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/analysis.js"></script>
+
+</body>
+</html>

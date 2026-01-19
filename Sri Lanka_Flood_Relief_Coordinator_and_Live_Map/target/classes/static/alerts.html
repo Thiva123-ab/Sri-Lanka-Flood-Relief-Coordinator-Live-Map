@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - Flood Relief Sri Lanka</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<header class="app-header">
+    <div class="logo">
+        <h1>🌊 Flood Relief SL</h1>
+    </div>
+    <div class="user-info">
+        <span id="user-role">Member</span>
+        <button id="logout-btn" class="btn btn-secondary">Logout</button>
+    </div>
+</header>
+
+<main class="main-container">
+    <div class="alerts-container">
+        <h1>Government Alerts</h1>
+        <div class="alert-list">
+            <div class="alert-card high">
+                <div class="alert-header">
+                    <h3>Flash Flood Warning</h3>
+                    <span class="alert-level">HIGH</span>
+                </div>
+                <div class="alert-body">
+                    <p>Heavy rainfall expected in Western Province. Residents in low-lying areas should evacuate immediately.</p>
+                    <div class="alert-meta">
+                        <span><i class="far fa-clock"></i> Issued: Today 10:30 AM</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Western Province</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-card medium">
+                <div class="alert-header">
+                    <h3>Landslide Advisory</h3>
+                    <span class="alert-level">MEDIUM</span>
+                </div>
+                <div class="alert-body">
+                    <p>Saturated soil conditions in Hill Country regions. Caution advised for travel on mountain roads.</p>
+                    <div class="alert-meta">
+                        <span><i class="far fa-clock"></i> Issued: Yesterday 3:45 PM</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Central Province</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-card low">
+                <div class="alert-header">
+                    <h3>River Level Monitoring</h3>
+                    <span class="alert-level">LOW</span>
+                </div>
+                <div class="alert-body">
+                    <p>Kelani River levels rising but within safe limits. Continue monitoring updates.</p>
+                    <div class="alert-meta">
+                        <span><i class="far fa-clock"></i> Issued: Jun 14 8:15 AM</span>
+                        <span><i class="fas fa-map-marker-alt"></i> Colombo District</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn" onclick="location.href='map.html'">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Map</span>
+        </button>
+        <button class="nav-btn" onclick="location.href='report.html'">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Reports</span>
+        </button>
+        <button class="nav-btn active" onclick="location.href='alerts.html'">
+            <i class="fas fa-bell"></i>
+            <span>Alerts</span>
+        </button>
+        <button class="nav-btn" onclick="location.href='chat.html'">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+        </button>
+        <button class="nav-btn" onclick="location.href='help.html'">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+    </nav>
+</main>
+
+<footer class="app-footer">
+    <div class="footer-content">
+        <div class="footer-logo">
+            <h2>🌊 Flood Relief SL</h2>
+            <p>Protecting Sri Lankan communities from flood risks</p>
+        </div>
+        <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="map.html">Live Map</a></li>
+                <li><a href="help.html">Help Request</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </ul>
+        </div>
+        <div class="footer-contact">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
+            <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+<script src="js/alerts.js"></script>
+</body>
+</html>

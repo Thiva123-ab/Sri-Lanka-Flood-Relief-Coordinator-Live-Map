@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flood Relief Sri Lanka - Live Map</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    .modal {
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 80px;
+    }
+    .modal[style*="display: block"] {
+      display: flex !important;
+    }
+    .modal-content {
+      margin: 0 !important;
+      max-height: 80vh;
+      overflow-y: auto;
+      width: 90%;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <h1>🌊 Flood Relief SL</h1>
+  </div>
+  <div class="user-info">
+    <span id="user-role">Guest</span>
+    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+  </div>
+</header>
+
+<main class="main-container">
+  <div id="map-container">
+    <div id="map"></div>
+  </div>
+
+  <button id="fab" class="fab">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <div id="place-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modal-title">Add Flood Report</h2>
+
+      <form id="place-form">
+        <input type="hidden" id="selected-lat" name="lat">
+        <input type="hidden" id="selected-lng" name="lng">
+
+        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; color: #ccc; text-align: center;">
+          <i class="fas fa-map-pin" style="color: #FFD700;"></i>
+          <span id="location-status">Click on map to select location</span>
+        </div>
+
+        <div class="form-group">
+          <label for="place-name">Place Name</label>
+          <input type="text" id="place-name" placeholder="E.g., Colombo Fort Station" required>
+        </div>
+        <div class="form-group">
+          <label for="place-type">Type</label>
+          <select id="place-type" required>
+            <option value="flood">Flood Area</option>
+            <option value="landslide">Landslide Risk</option>
+            <option value="road-block">Blocked Road</option>
+            <option value="safe-zone">Safe Zone</option>
+            <option value="rescue-needed">Rescue Needed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="place-description">Description</label>
+          <textarea id="place-description" rows="3" placeholder="Describe the situation..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="place-severity">Severity Level</label>
+          <select id="place-severity" required>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Submit for Approval</button>
+      </form>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="map">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>Map</span>
+    </button>
+    <button class="nav-btn" data-tab="reports">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>Reports</span>
+    </button>
+    <button class="nav-btn" data-tab="alerts">
+      <i class="fas fa-bell"></i>
+      <span>Alerts</span>
+    </button>
+    <button class="nav-btn" onclick="location.href='chat.html'">
+      <i class="fas fa-comments"></i>
+      <span>Chat</span>
+    </button>
+    <button class="nav-btn" data-tab="profile">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </button>
+  </nav>
+</main>
+
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+      <h2>🌊 Flood Relief SL</h2>
+      <p>Protecting Sri Lankan communities from flood risks</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script src="js/auth.js"></script>
+<script src="js/map.js"></script>
+<script src="js/main.js"></script>
+<script src="js/form.js"></script>
+</body>
+</html>
