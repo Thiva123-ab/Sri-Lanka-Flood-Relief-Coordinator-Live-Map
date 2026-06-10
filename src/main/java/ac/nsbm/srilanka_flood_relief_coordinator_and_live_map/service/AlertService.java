@@ -23,13 +23,4 @@ public class AlertService {
         }
         return alertRepository.save(alert);
     }
-
-    // --- ADDED THIS METHOD ---
-    public void deleteAlert(Long id) {
-        if (alertRepository.existsById(id)) {
-            alertRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Alert not found with id: " + id);
-        }
-    }
 }
