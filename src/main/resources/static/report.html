@@ -6,152 +6,159 @@
   <title>Reports - Flood Relief Sri Lanka</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
+  </script>
   <style>
-    .modal {
-      align-items: center;
-      justify-content: center;
-      padding-bottom: 80px;
-    }
-    .modal[style*="display: block"] {
-      display: flex !important;
-    }
-    .modal-content {
-      margin: 0 !important;
-      max-height: 80vh;
-      overflow-y: auto;
-      width: 90%;
-      max-width: 500px;
-    }
-    .modal-content::-webkit-scrollbar { width: 8px; }
-    .modal-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
-    .modal-content::-webkit-scrollbar-thumb { background: #4CAF50; border-radius: 4px; }
+      body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+      .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+      
+      .fab { position: fixed; bottom: 100px; right: 24px; z-index: 40; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; }
+      .fab:hover { transform: scale(1.1) rotate(90deg); }
 
-    /* New Stat Card Styles for Member Dashboard */
-    .stat-card.pending { border-left: 4px solid #FF9800; }
-    .stat-card.rejected { border-left: 4px solid #f44336; }
-    .stat-card.approved { border-left: 4px solid #4CAF50; }
+      .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+      .modal[style*="display: block"] { display: flex !important; }
+      .input-field { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+      .input-field:focus { border-color: #3b82f6; outline: none; }
+
+      .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
+      .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
   </style>
 </head>
-<body>
+<body class="relative min-h-screen bg-slate-900 pb-20">
 
-<header class="app-header">
-  <div class="logo">
-    <h1>🌊 Flood Relief SL</h1>
-  </div>
-  <div class="user-info">
-    <span id="user-role">Member</span>
-    <button id="logout-btn" class="btn btn-secondary">Logout</button>
-  </div>
+<header class="fixed w-full top-0 z-50 glass-panel border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="logo flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center">
+                <i class="fas fa-water text-white text-sm"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">My Reports</h1>
+        </div>
+        <div class="user-info flex items-center gap-4">
+            <span id="user-role" class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold tracking-wider backdrop-blur-md">Member</span>
+            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors">Logout</button>
+        </div>
+    </div>
 </header>
 
-<main class="main-container">
-  <div class="admin-dashboard">
-    <h1>My Report Status</h1>
+<main class="pt-24 px-4 max-w-7xl mx-auto main-container">
+  <div class="admin-dashboard animate__animated animate__fadeIn">
+    
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">My Report Status</h1>
+        <p class="text-slate-400">Track the status of incidents you've reported.</p>
+    </div>
 
-    <div class="dashboard-stats">
-      <div class="stat-card pending">
-        <h3><i class="fas fa-clock" style="color: #FF9800;"></i> Pending</h3>
-        <p id="my-pending-count">0</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 dashboard-stats">
+      <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group border-t-4 border-amber-500">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
+        <div class="flex items-center gap-4 mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div>
+            <h3 class="text-slate-300 font-medium uppercase tracking-wide text-sm">Pending</h3>
+        </div>
+        <p id="my-pending-count" class="text-4xl font-black text-white relative z-10">0</p>
       </div>
-      <div class="stat-card approved">
-        <h3><i class="fas fa-check-circle" style="color: #4CAF50;"></i> Approved</h3>
-        <p id="my-approved-count">0</p>
+
+      <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group border-t-4 border-emerald-500">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
+        <div class="flex items-center gap-4 mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div>
+            <h3 class="text-slate-300 font-medium uppercase tracking-wide text-sm">Approved</h3>
+        </div>
+        <p id="my-approved-count" class="text-4xl font-black text-white relative z-10">0</p>
       </div>
-      <div class="stat-card rejected">
-        <h3><i class="fas fa-times-circle" style="color: #f44336;"></i> Rejected</h3>
-        <p id="my-rejected-count">0</p>
+
+      <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group border-t-4 border-rose-500">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
+        <div class="flex items-center gap-4 mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-500 flex items-center justify-center text-xl"><i class="fas fa-times-circle"></i></div>
+            <h3 class="text-slate-300 font-medium uppercase tracking-wide text-sm">Rejected</h3>
+        </div>
+        <p id="my-rejected-count" class="text-4xl font-black text-white relative z-10">0</p>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Recent Activity</h2>
-      <div id="public-reports-list" class="reports-list">
-        <p style="text-align: center; color: #ccc;">Loading reports...</p>
+    <div class="section glass-panel p-8 rounded-3xl">
+      <h2 class="text-xl font-bold mb-6 text-white border-b border-white/10 pb-4">Recent Activity</h2>
+      <div id="public-reports-list" class="reports-list grid grid-cols-1 md:grid-cols-2 gap-4">
+        <p class="text-center text-slate-500 py-8 col-span-full animate-pulse">Loading reports...</p>
       </div>
     </div>
   </div>
 
-  <button id="fab" class="fab">
+  <button id="fab" class="fab animate__animated animate__zoomIn animate__delay-1s">
     <i class="fas fa-plus"></i>
   </button>
 
   <div id="place-modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="modal-title">Add Flood Report</h2>
-      <form id="place-form">
+    <div class="modal-content glass-panel rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-cyan-500">
+      <span class="close absolute top-5 right-6 text-2xl text-slate-400 hover:text-white cursor-pointer">&times;</span>
+      <h2 id="modal-title" class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-map-pin text-cyan-400"></i> Add Flood Report</h2>
+
+      <form id="place-form" class="space-y-4">
         <div class="form-group">
-          <label for="place-name">Place Name</label>
-          <input type="text" id="place-name" placeholder="E.g., Colombo Fort Station" required>
+          <label for="place-name" class="block text-sm text-slate-300 mb-1">Place Name</label>
+          <input type="text" id="place-name" class="input-field w-full p-3 rounded-xl text-white" placeholder="E.g., Colombo Fort Station" required>
         </div>
+        
         <div class="form-group">
-          <label for="place-type">Type</label>
-          <select id="place-type" required>
-            <option value="flood">Flood Area</option>
-            <option value="landslide">Landslide Risk</option>
-            <option value="road-block">Blocked Road</option>
-            <option value="safe-zone">Safe Zone</option>
-            <option value="rescue-needed">Rescue Needed</option>
+          <label for="place-type" class="block text-sm text-slate-300 mb-1">Type</label>
+          <select id="place-type" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
+            <option value="flood" class="bg-slate-800">Flood Area</option>
+            <option value="landslide" class="bg-slate-800">Landslide Risk</option>
+            <option value="road-block" class="bg-slate-800">Blocked Road</option>
+            <option value="safe-zone" class="bg-slate-800">Safe Zone</option>
+            <option value="rescue-needed" class="bg-slate-800">Rescue Needed</option>
           </select>
         </div>
+        
         <div class="form-group">
-          <label for="place-description">Description</label>
-          <textarea id="place-description" rows="3" placeholder="Describe the situation..." required></textarea>
+          <label for="place-description" class="block text-sm text-slate-300 mb-1">Description</label>
+          <textarea id="place-description" rows="3" class="input-field w-full p-3 rounded-xl text-white" placeholder="Describe the situation..." required></textarea>
         </div>
+        
         <div class="form-group">
-          <label for="place-severity">Severity Level</label>
-          <select id="place-severity" required>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
+          <label for="place-severity" class="block text-sm text-slate-300 mb-1">Severity Level</label>
+          <select id="place-severity" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
+            <option value="low" class="bg-slate-800">Low</option>
+            <option value="medium" class="bg-slate-800">Medium</option>
+            <option value="high" class="bg-slate-800">High</option>
+            <option value="critical" class="bg-slate-800">Critical</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Submit for Approval</button>
+        
+        <button type="submit" class="w-full py-3 mt-4 rounded-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 transition-colors text-white shadow-lg">Submit for Approval</button>
       </form>
     </div>
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-btn" data-tab="map">
-      <i class="fas fa-map-marked-alt"></i>
-      <span>Map</span>
-    </button>
-    <button class="nav-btn active" data-tab="reports">
-      <i class="fas fa-exclamation-triangle"></i>
-      <span>Reports</span>
-    </button>
-    <button class="nav-btn" data-tab="alerts">
-      <i class="fas fa-bell"></i>
-      <span>Alerts</span>
-    </button>
-    <button class="nav-btn" onclick="location.href='chat.html'">
-      <i class="fas fa-comments"></i>
-      <span>Chat</span>
-    </button>
-    <button class="nav-btn" data-tab="profile">
-      <i class="fas fa-user"></i>
-      <span>Profile</span>
-    </button>
-  </nav>
 </main>
 
-<footer class="app-footer">
-  <div class="footer-content">
-    <div class="footer-logo">
-      <h2>🌊 Flood Relief SL</h2>
-      <p>Protecting Sri Lankan communities from flood risks</p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
-  </div>
-</footer>
+<nav class="fixed bottom-0 w-full glass-panel border-t border-white/10 flex sm:hidden z-50">
+    <button class="nav-btn py-4" data-tab="map">
+      <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
+    </button>
+    <button class="nav-btn active py-4" data-tab="reports">
+      <i class="fas fa-exclamation-triangle text-lg mb-1"></i><span class="text-xs">Reports</span>
+    </button>
+    <button class="nav-btn py-4" data-tab="alerts">
+      <i class="fas fa-bell text-lg mb-1"></i><span class="text-xs">Alerts</span>
+    </button>
+    <button class="nav-btn py-4" onclick="location.href='chat.html'">
+      <i class="fas fa-comments text-lg mb-1"></i><span class="text-xs">Chat</span>
+    </button>
+    <button class="nav-btn py-4" data-tab="profile">
+      <i class="fas fa-user text-lg mb-1"></i><span class="text-xs">Profile</span>
+    </button>
+</nav>
 
 <script src="js/auth.js"></script>
 <script src="js/main.js"></script>
 <script src="js/report.js"></script>
-
 </body>
 </html>
