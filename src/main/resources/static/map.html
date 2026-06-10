@@ -3,132 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flood Relief Sri Lanka - Live Map</title>
+  <title>Live Map - Flood Relief Sri Lanka</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
+  </script>
   <style>
-    .modal {
-      align-items: center;
-      justify-content: center;
-      padding-bottom: 80px;
-    }
-    .modal[style*="display: block"] {
-      display: flex !important;
-    }
-    .modal-content {
-      margin: 0 !important;
-      max-height: 80vh;
-      overflow-y: auto;
-      width: 90%;
-      max-width: 500px;
-    }
+      body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
+      .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+      #map-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; }
+      #map { width: 100%; height: 100%; }
+      /* Overlays */
+      .header-overlay { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; }
+      .fab { position: fixed; bottom: 100px; right: 24px; z-index: 40; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; }
+      .fab:hover { transform: scale(1.1) rotate(90deg); }
+      
+      .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+      .modal[style*="display: block"] { display: flex !important; }
+      .input-field { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+      .input-field:focus { border-color: #3b82f6; outline: none; }
+      
+      .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
+      .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
   </style>
 </head>
-<body>
+<body class="relative min-h-screen bg-slate-900">
 
-<header class="app-header">
-  <div class="logo">
-    <h1>🌊 Flood Relief SL</h1>
-  </div>
-  <div class="user-info">
-    <span id="user-role">Guest</span>
-    <button id="logout-btn" class="btn btn-secondary">Logout</button>
-  </div>
+<!-- Fullscreen Map -->
+<div id="map-container">
+  <div id="map"></div>
+</div>
+
+<header class="header-overlay glass-panel border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="logo flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <i class="fas fa-water text-white text-sm"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block shadow-black drop-shadow-md">Live Map</h1>
+        </div>
+        <div class="user-info flex items-center gap-4">
+            <span id="user-role" class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold tracking-wider backdrop-blur-md shadow-black drop-shadow-md">Guest</span>
+            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg">Logout</button>
+        </div>
+    </div>
 </header>
 
-<main class="main-container">
-  <div id="map-container">
-    <div id="map"></div>
+<button id="fab" class="fab animate__animated animate__zoomIn animate__delay-1s">
+  <i class="fas fa-plus"></i>
+</button>
+
+<div id="place-modal" class="modal">
+  <div class="modal-content glass-panel rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-cyan-500">
+    <span class="close absolute top-5 right-6 text-2xl text-slate-400 hover:text-white cursor-pointer">&times;</span>
+    <h2 id="modal-title" class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-map-pin text-cyan-400"></i> Add Map Report</h2>
+
+    <form id="place-form" class="space-y-4">
+      <input type="hidden" id="selected-lat" name="lat">
+      <input type="hidden" id="selected-lng" name="lng">
+
+      <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl flex items-center justify-center gap-2 text-sm text-blue-200 mb-4">
+        <i class="fas fa-crosshairs text-blue-400 animate-pulse"></i>
+        <span id="location-status">Click on map to select location</span>
+      </div>
+
+      <div class="form-group">
+        <label for="place-name" class="block text-sm text-slate-300 mb-1">Place Name</label>
+        <input type="text" id="place-name" class="input-field w-full p-3 rounded-xl text-white" placeholder="E.g., Colombo Fort Station" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="place-type" class="block text-sm text-slate-300 mb-1">Type</label>
+        <select id="place-type" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
+          <option value="flood" class="bg-slate-800">Flood Area</option>
+          <option value="landslide" class="bg-slate-800">Landslide Risk</option>
+          <option value="road-block" class="bg-slate-800">Blocked Road</option>
+          <option value="safe-zone" class="bg-slate-800">Safe Zone</option>
+          <option value="rescue-needed" class="bg-slate-800">Rescue Needed</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="place-description" class="block text-sm text-slate-300 mb-1">Description</label>
+        <textarea id="place-description" rows="3" class="input-field w-full p-3 rounded-xl text-white" placeholder="Describe the situation..." required></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="place-severity" class="block text-sm text-slate-300 mb-1">Severity Level</label>
+        <select id="place-severity" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
+          <option value="low" class="bg-slate-800">Low</option>
+          <option value="medium" class="bg-slate-800">Medium</option>
+          <option value="high" class="bg-slate-800">High</option>
+          <option value="critical" class="bg-slate-800">Critical</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="w-full py-3 mt-4 rounded-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 transition-colors text-white shadow-lg">Submit Location</button>
+    </form>
   </div>
+</div>
 
-  <button id="fab" class="fab">
-    <i class="fas fa-plus"></i>
-  </button>
-
-  <div id="place-modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="modal-title">Add Flood Report</h2>
-
-      <form id="place-form">
-        <input type="hidden" id="selected-lat" name="lat">
-        <input type="hidden" id="selected-lng" name="lng">
-
-        <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; color: #ccc; text-align: center;">
-          <i class="fas fa-map-pin" style="color: #FFD700;"></i>
-          <span id="location-status">Click on map to select location</span>
-        </div>
-
-        <div class="form-group">
-          <label for="place-name">Place Name</label>
-          <input type="text" id="place-name" placeholder="E.g., Colombo Fort Station" required>
-        </div>
-        <div class="form-group">
-          <label for="place-type">Type</label>
-          <select id="place-type" required>
-            <option value="flood">Flood Area</option>
-            <option value="landslide">Landslide Risk</option>
-            <option value="road-block">Blocked Road</option>
-            <option value="safe-zone">Safe Zone</option>
-            <option value="rescue-needed">Rescue Needed</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="place-description">Description</label>
-          <textarea id="place-description" rows="3" placeholder="Describe the situation..." required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="place-severity">Severity Level</label>
-          <select id="place-severity" required>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Submit for Approval</button>
-      </form>
-    </div>
-  </div>
-
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="map">
-      <i class="fas fa-map-marked-alt"></i>
-      <span>Map</span>
+<nav class="fixed bottom-0 w-full glass-panel border-t border-white/10 flex z-50">
+    <button class="nav-btn active py-4" data-tab="map">
+      <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>
-    <button class="nav-btn" data-tab="reports">
-      <i class="fas fa-exclamation-triangle"></i>
-      <span>Reports</span>
+    <button class="nav-btn py-4" data-tab="reports">
+      <i class="fas fa-exclamation-triangle text-lg mb-1"></i><span class="text-xs">Reports</span>
     </button>
-    <button class="nav-btn" data-tab="alerts">
-      <i class="fas fa-bell"></i>
-      <span>Alerts</span>
+    <button class="nav-btn py-4" data-tab="alerts">
+      <i class="fas fa-bell text-lg mb-1"></i><span class="text-xs">Alerts</span>
     </button>
-    <button class="nav-btn" onclick="location.href='chat.html'">
-      <i class="fas fa-comments"></i>
-      <span>Chat</span>
+    <button class="nav-btn py-4" onclick="location.href='chat.html'">
+      <i class="fas fa-comments text-lg mb-1"></i><span class="text-xs">Chat</span>
     </button>
-    <button class="nav-btn" data-tab="profile">
-      <i class="fas fa-user"></i>
-      <span>Profile</span>
+    <button class="nav-btn py-4" data-tab="profile">
+      <i class="fas fa-user text-lg mb-1"></i><span class="text-xs">Profile</span>
     </button>
-  </nav>
-</main>
-
-<footer class="app-footer">
-  <div class="footer-content">
-    <div class="footer-logo">
-      <h2>🌊 Flood Relief SL</h2>
-      <p>Protecting Sri Lankan communities from flood risks</p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
-  </div>
-</footer>
+</nav>
 
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>

@@ -4,142 +4,200 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flood Relief Sri Lanka - Dashboard</title>
+    <!-- Keep existing style.css for fallback & JS bindings, but we will mostly override with Tailwind -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Beautiful UI Method: Tailwind CSS & Animate.css -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: {
+              brand: { 500: '#3b82f6', 600: '#2563eb' },
+              dark: '#0f172a',
+              glass: 'rgba(255, 255, 255, 0.1)'
+            },
+            animation: {
+              'blob': 'blob 7s infinite',
+              'float': 'float 6s ease-in-out infinite'
+            },
+            keyframes: {
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; overflow-x: hidden; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+        .hover-lift { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.3); }
+        .text-gradient { background: linear-gradient(to right, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
 </head>
-<body>
+<body class="relative min-h-screen bg-slate-900 selection:bg-brand-500 selection:text-white">
 
-<header class="app-header">
-    <div class="logo">
-        <h1>🌊 Flood Relief SL</h1>
-    </div>
-    <div class="user-info">
-        <span id="user-role">Guest</span>
-        <button id="login-btn" class="btn btn-secondary">Login</button>
+<!-- Animated Background Blobs -->
+<div class="fixed inset-0 w-full h-full overflow-hidden z-[-1] pointer-events-none">
+    <div class="absolute top-0 -left-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute top-0 -right-4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+</div>
+
+<header class="fixed w-full top-0 z-50 glass-panel border-b border-white/10 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="logo flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30 animate-pulse">
+                <i class="fas fa-water text-white text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight text-white">Flood Relief <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">SL</span></h1>
+        </div>
+        <div class="user-info flex items-center gap-6">
+            <span id="user-role" class="hidden md:inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm font-medium tracking-wide text-blue-200 backdrop-blur-md">Guest</span>
+            <button id="login-btn" class="group relative px-6 py-2.5 font-semibold text-white rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 overflow-hidden shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all hover:scale-105 active:scale-95">
+                <span class="relative z-10">Login / Register</span>
+                <div class="absolute inset-0 h-full w-full bg-white/20 group-hover:translate-x-0 -translate-x-full transition-transform duration-300 ease-out skew-x-12"></div>
+            </button>
+        </div>
     </div>
 </header>
 
-<main class="dashboard-container">
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1>Flood Relief Sri Lanka</h1>
-            <p>Real-time flood mapping and emergency response platform for Sri Lankan communities</p>
-            <div class="hero-buttons">
-                <button id="get-started-btn" class="btn btn-primary">Get Started</button>
-                <button id="view-map-btn" class="btn btn-secondary">View Live Map</button>
+<main class="pt-32 pb-24 px-6 max-w-7xl mx-auto dashboard-container">
+    
+    <!-- Hero Section -->
+    <section class="hero-section text-center py-20 mb-16 animate__animated animate__fadeInUp">
+        <div class="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 font-medium text-sm mb-6 animate__animated animate__fadeInDown">
+            <i class="fas fa-satellite-dish mr-2 animate-pulse"></i> Live Emergency Coordination Network
+        </div>
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
+            Protecting Communities with <br/>
+            <span class="text-gradient animate-pulse">Real-Time Data.</span>
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+            The advanced disaster response platform for Sri Lanka. We connect communities, relief workers, and authorities instantly through interactive mapping and emergency alerts.
+        </p>
+        <div class="hero-buttons flex flex-col sm:flex-row justify-center gap-5">
+            <button id="get-started-btn" class="group px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold text-lg hover:bg-gray-100 transition-all hover:scale-105 shadow-xl shadow-white/10 flex items-center justify-center gap-3">
+                Report an Emergency <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </button>
+            <button id="view-map-btn" onclick="location.href='map.html'" class="px-8 py-4 rounded-2xl glass-panel text-white font-bold text-lg hover:bg-white/10 transition-all hover:scale-105 flex items-center justify-center gap-3">
+                <i class="fas fa-map-marked-alt text-cyan-400"></i> Open Live Map
+            </button>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="services-section mb-24 animate__animated animate__fadeInUp animate__delay-1s">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Core Capabilities</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-cyan-400 mx-auto rounded-full"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 services-grid">
+            <div class="service-card glass-panel p-8 rounded-3xl hover-lift group">
+                <div class="w-16 h-16 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-3xl mb-6 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300 service-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-white">Live Mapping</h3>
+                <p class="text-slate-400 leading-relaxed">Interactive visualization of danger zones and safe shelters across the island.</p>
+            </div>
+            
+            <div class="service-card glass-panel p-8 rounded-3xl hover-lift group">
+                <div class="w-16 h-16 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-3xl mb-6 group-hover:bg-red-500 group-hover:text-white transition-colors duration-300 service-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-white">Instant Alerts</h3>
+                <p class="text-slate-400 leading-relaxed">Verified emergency warnings pushed directly to your device when danger approaches.</p>
+            </div>
+            
+            <div class="service-card glass-panel p-8 rounded-3xl hover-lift group">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-3xl mb-6 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300 service-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-white">Rescue Requests</h3>
+                <p class="text-slate-400 leading-relaxed">One-tap SOS features to request immediate evacuation or medical assistance.</p>
+            </div>
+            
+            <div class="service-card glass-panel p-8 rounded-3xl hover-lift group">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 service-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-white">Community Sync</h3>
+                <p class="text-slate-400 leading-relaxed">Direct communication channels connecting victims with nearby volunteers.</p>
             </div>
         </div>
     </section>
 
-    <section class="services-section">
-        <h2>Our Services</h2>
-        <div class="services-grid">
-            <div class="service-card">
-                <i class="fas fa-map-marked-alt service-icon"></i>
-                <h3>Live Flood Mapping</h3>
-                <p>Real-time interactive map showing flood-affected areas, danger zones, and safe shelters</p>
+    <!-- Stats Section -->
+    <section class="stats-section mb-24 glass-panel rounded-[3rem] p-12 relative overflow-hidden border border-white/10">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 mix-blend-overlay"></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative z-10 stats-grid">
+            <div class="stat-card">
+                <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mb-2" id="communities-count">120+</h3>
+                <p class="text-slate-400 font-medium tracking-wide uppercase text-sm"><i class="fas fa-city mr-2 text-blue-400"></i>Communities</p>
             </div>
-            <div class="service-card">
-                <i class="fas fa-bell service-icon"></i>
-                <h3>Emergency Alerts</h3>
-                <p>Verified government alerts and community warnings delivered directly to your device</p>
+            <div class="stat-card">
+                <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mb-2" id="locations-count">2.5k</h3>
+                <p class="text-slate-400 font-medium tracking-wide uppercase text-sm"><i class="fas fa-map-pin mr-2 text-cyan-400"></i>Locations</p>
             </div>
-            <div class="service-card">
-                <i class="fas fa-exclamation-triangle service-icon"></i>
-                <h3>Community Reporting</h3>
-                <p>Report flood conditions, blocked roads, and rescue needs with our simple reporting system</p>
+            <div class="stat-card">
+                <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mb-2" id="alerts-count">180</h3>
+                <p class="text-slate-400 font-medium tracking-wide uppercase text-sm"><i class="fas fa-shield-alt mr-2 text-emerald-400"></i>Alerts Active</p>
             </div>
-            <div class="service-card">
-                <i class="fas fa-hands-helping service-icon"></i>
-                <h3>Help Requests</h3>
-                <p>Quickly request emergency assistance with automatic location detection</p>
+            <div class="stat-card">
+                <h3 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mb-2" id="rescues-count">450+</h3>
+                <p class="text-slate-400 font-medium tracking-wide uppercase text-sm"><i class="fas fa-life-ring mr-2 text-red-400"></i>Rescues Done</p>
             </div>
         </div>
     </section>
 
-    <section class="features-section">
-        <h2>Key Features</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Multi-language Support</h3>
-                <p>Available in English, Sinhala, and Tamil to serve all Sri Lankan communities</p>
-            </div>
-            <div class="feature-card">
-                <h3>Mobile Optimized</h3>
-                <p>Designed for smartphones with large buttons and easy navigation for stressful situations</p>
-            </div>
-            <div class="feature-card">
-                <h3>Offline Capability</h3>
-                <p>Works in low-connectivity areas with offline form submission</p>
-            </div>
-            <div class="feature-card">
-                <h3>Role-based Access</h3>
-                <p>Separate interfaces for community members and emergency responders</p>
-            </div>
-            <div class="feature-card">
-                <h3>Real-time Updates</h3>
-                <p>Instant notifications for new reports and emergency alerts</p>
-            </div>
-            <div class="feature-card">
-                <h3>Verification System</h3>
-                <p>All reports are verified by authorized personnel before appearing on public maps</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="stats-section">
-        <h2>Community Impact</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3><i class="fas fa-users"></i> Communities Served</h3>
-                <p id="communities-count">120+</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-map-marker-alt"></i> Locations Reported</h3>
-                <p id="locations-count">2,500+</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-bell"></i> Alerts Issued</h3>
-                <p id="alerts-count">180+</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-hands-helping"></i> Rescues Facilitated</h3>
-                <p id="rescues-count">450+</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta-section">
-        <h2>Join Our Community</h2>
-        <p>Be part of the solution. Sign up today to help protect your community from flood risks.</p>
-        <button id="signup-btn" class="btn btn-primary">Sign Up Now</button>
-    </section>
 </main>
 
-<footer class="app-footer">
-    <div class="footer-content">
+<footer class="glass-panel border-t border-white/10 mt-auto relative z-10">
+    <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-12">
         <div class="footer-logo">
-            <h2>🌊 Flood Relief SL</h2>
-            <p>Protecting Sri Lankan communities from flood risks</p>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center">
+                    <i class="fas fa-water text-white text-sm"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white">Flood Relief SL</h2>
+            </div>
+            <p class="text-slate-400 leading-relaxed">Protecting Sri Lankan communities through technology, coordination, and rapid response.</p>
         </div>
         <div class="footer-links">
-            <h3>Quick Links</h3>
-            <ul>
-                <li><a href="map.html">Live Map</a></li>
-                <li><a href="alerts.html">Alerts</a></li>
-                <li><a href="help.html">Help Request</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="register.html">Register</a></li>
+            <h3 class="text-white font-semibold mb-6">Platform Links</h3>
+            <ul class="space-y-3 text-slate-400">
+                <li><a href="map.html" class="hover:text-blue-400 transition-colors"><i class="fas fa-chevron-right text-xs mr-2"></i> Live Map</a></li>
+                <li><a href="alerts.html" class="hover:text-blue-400 transition-colors"><i class="fas fa-chevron-right text-xs mr-2"></i> Emergency Alerts</a></li>
+                <li><a href="login.html" class="hover:text-blue-400 transition-colors"><i class="fas fa-chevron-right text-xs mr-2"></i> Coordinator Login</a></li>
             </ul>
         </div>
         <div class="footer-contact">
-            <h3>Contact Us</h3>
-            <p><i class="fas fa-envelope"></i> info@floodrelief.lk</p>
-            <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+            <h3 class="text-white font-semibold mb-6">Emergency Contact</h3>
+            <div class="space-y-4 text-slate-400">
+                <p class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-phone"></i></div> +94 11 234 5678</p>
+                <p class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i class="fas fa-envelope"></i></div> sos@floodrelief.lk</p>
+            </div>
         </div>
     </div>
-    <div class="footer-bottom">
-        <p>&copy; 2023 Flood Relief Sri Lanka. All rights reserved.</p>
+    <div class="border-t border-white/10 py-6 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 Flood Relief Sri Lanka. Advanced Disaster Management System.</p>
     </div>
 </footer>
 

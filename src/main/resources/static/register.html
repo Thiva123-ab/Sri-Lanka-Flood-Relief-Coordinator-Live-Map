@@ -6,53 +6,77 @@
   <title>Register - Flood Relief Sri Lanka</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+  </script>
+  <style>
+      body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+      .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+      .input-field { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+      .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.3); outline: none; }
+  </style>
 </head>
-<body>
-<div class="auth-container">
-  <div class="auth-box">
-    <div class="logo">
-      <h1>🌊 Flood Relief SL</h1>
-      <p>Create a new account</p>
+<body class="relative min-h-screen bg-slate-900 flex items-center justify-center p-4 py-12">
+
+<div class="fixed inset-0 w-full h-full overflow-hidden z-[-1] pointer-events-none">
+    <div class="absolute top-1/4 -right-10 w-96 h-96 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-[blob_7s_infinite]"></div>
+    <div class="absolute bottom-0 -left-10 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-[blob_7s_infinite_2s]"></div>
+</div>
+
+<div class="w-full max-w-md animate__animated animate__fadeInUp">
+  <div class="glass-panel rounded-3xl p-10 shadow-2xl shadow-blue-900/20 relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500"></div>
+
+    <div class="logo text-center mb-8">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/30 mb-4">
+        <i class="fas fa-user-plus text-white text-2xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold tracking-tight text-white mb-2">Create Account</h1>
+      <p class="text-slate-400">Join the relief network</p>
     </div>
 
-    <form id="register-form">
+    <form id="register-form" class="space-y-5">
       <div class="form-group">
-        <label for="reg-username">Username</label>
-        <input type="text" id="reg-username" placeholder="Choose a username" required>
-      </div>
-
-      <div class="form-group">
-        <label for="reg-email">Email</label>
-        <input type="email" id="reg-email" placeholder="Enter your email" required>
-      </div>
-
-      <div class="form-group" style="position: relative;">
-        <label for="reg-password">Password</label>
-        <input type="password" id="reg-password" placeholder="Create a password" required style="padding-right: 40px;">
-        <i class="fas fa-eye toggle-password" data-target="reg-password"
-           style="position: absolute; right: 15px; top: 43px; cursor: pointer; color: #ccc; z-index: 10;"></i>
-      </div>
-
-      <div class="form-group" style="position: relative;">
-        <label for="reg-confirm-password">Confirm Password</label>
-        <input type="password" id="reg-confirm-password" placeholder="Confirm your password" required style="padding-right: 40px;">
-        <i class="fas fa-eye toggle-password" data-target="reg-confirm-password"
-           style="position: absolute; right: 15px; top: 43px; cursor: pointer; color: #ccc; z-index: 10;"></i>
+        <label for="reg-username" class="block text-sm font-medium text-slate-300 mb-2">Username</label>
+        <input type="text" id="reg-username" class="input-field w-full rounded-xl px-4 py-3 text-white placeholder-slate-500" placeholder="Choose a username" required>
       </div>
 
       <div class="form-group">
-        <label for="reg-role">Role</label>
-        <select id="reg-role" required>
-          <option value="member">Member</option>
-          <option value="admin">Admin</option>
+        <label for="reg-email" class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+        <input type="email" id="reg-email" class="input-field w-full rounded-xl px-4 py-3 text-white placeholder-slate-500" placeholder="Enter your email" required>
+      </div>
+
+      <div class="form-group relative">
+        <label for="reg-password" class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+        <input type="password" id="reg-password" class="input-field w-full rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-500" placeholder="Create a password" required>
+        <i class="fas fa-eye toggle-password absolute right-4 top-[38px] text-slate-400 cursor-pointer hover:text-white" data-target="reg-password"></i>
+      </div>
+
+      <div class="form-group relative">
+        <label for="reg-confirm-password" class="block text-sm font-medium text-slate-300 mb-2">Confirm Password</label>
+        <input type="password" id="reg-confirm-password" class="input-field w-full rounded-xl px-4 py-3 pr-12 text-white placeholder-slate-500" placeholder="Confirm your password" required>
+        <i class="fas fa-eye toggle-password absolute right-4 top-[38px] text-slate-400 cursor-pointer hover:text-white" data-target="reg-confirm-password"></i>
+      </div>
+
+      <div class="form-group relative">
+        <label for="reg-role" class="block text-sm font-medium text-slate-300 mb-2">Select Role</label>
+        <select id="reg-role" class="input-field w-full rounded-xl px-4 py-3 text-white appearance-none" required>
+          <option value="member" class="bg-slate-800">Community Member</option>
+          <option value="admin" class="bg-slate-800">System Administrator (Requires Approval)</option>
         </select>
+        <i class="fas fa-chevron-down absolute right-4 top-[40px] text-slate-400 pointer-events-none"></i>
       </div>
 
-      <button type="submit" class="btn btn-primary">Register</button>
+      <button type="submit" class="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 mt-6">
+        Register Account
+      </button>
     </form>
 
-    <div class="auth-footer">
-      <p>Already have an account? <a href="login.html">Login here</a></p>
+    <div class="mt-8 text-center border-t border-white/10 pt-6">
+      <p class="text-slate-400">Already have an account? <a href="login.html" class="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors">Login here</a></p>
     </div>
   </div>
 </div>
