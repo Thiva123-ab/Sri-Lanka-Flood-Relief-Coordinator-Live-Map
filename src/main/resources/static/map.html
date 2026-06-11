@@ -13,45 +13,46 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script>
-    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
+    tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
   </script>
   <style>
-      body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
-      .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+      body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; overflow: hidden; }
+      .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(0,0,0,0.05); }
       #map-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; }
       #map { width: 100%; height: 100%; }
       /* Overlays */
       .header-overlay { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; }
-      .fab { position: fixed; bottom: 100px; right: 24px; z-index: 40; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; }
+      .fab { position: fixed; bottom: 100px; right: 24px; z-index: 40; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; }
       .fab:hover { transform: scale(1.1) rotate(90deg); }
       
       .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
       .modal[style*="display: block"] { display: flex !important; }
-      .input-field { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
-      .input-field:focus { border-color: #3b82f6; outline: none; }
+      .input-field { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: #1e293b; transition: all 0.3s; }
+      .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); outline: none; }
       
       .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
       .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
   </style>
-</head>
-<body class="relative min-h-screen bg-slate-900">
+<script src="js/theme.js"></script></head>
+<body class="relative min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-teal-100 dark:from-indigo-950 dark:via-slate-900 dark:to-indigo-950">
 
 <!-- Fullscreen Map -->
 <div id="map-container">
   <div id="map"></div>
 </div>
 
-<header class="header-overlay glass-panel border-b border-white/10">
+<header class="header-overlay bg-white/40 dark:bg-indigo-950/70 dark:backdrop-blur-xl backdrop-blur-md border-b border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="logo flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <i class="fas fa-water text-white text-sm"></i>
+                <i class="fas fa-water text-slate-900 dark:text-slate-100 text-sm"></i>
             </div>
-            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block shadow-black drop-shadow-md">Live Map</h1>
+            <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 hidden sm:block shadow-black drop-shadow-md">Live Map</h1>
         </div>
         <div class="user-info flex items-center gap-4">
-            <span id="user-role" class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold tracking-wider backdrop-blur-md shadow-black drop-shadow-md">Guest</span>
-            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors shadow-lg">Logout</button>
+            <span id="user-role" class="px-3 py-1 rounded-full bg-slate-200/50 border border-slate-300 text-xs font-semibold tracking-wider backdrop-blur-md shadow-black drop-shadow-md">Guest</span>
+            <button id="theme-toggle" class="p-2 mr-3 rounded-full bg-slate-200 dark:bg-indigo-900/50 text-slate-800 dark:text-yellow-400 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors shadow-inner flex items-center justify-center w-10 h-10 border border-slate-300 dark:border-indigo-400/30"><i class="fas fa-moon"></i></button>
+            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-slate-900 dark:text-slate-100 bg-red-500 hover:bg-red-600 transition-colors shadow-lg">Logout</button>
         </div>
     </div>
 </header>
@@ -61,56 +62,56 @@
 </button>
 
 <div id="place-modal" class="modal">
-  <div class="modal-content glass-panel rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-cyan-500">
-    <span class="close absolute top-5 right-6 text-2xl text-slate-400 hover:text-white cursor-pointer">&times;</span>
-    <h2 id="modal-title" class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-map-pin text-cyan-400"></i> Add Map Report</h2>
+  <div class="modal-content bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-cyan-500">
+    <span class="close absolute top-5 right-6 text-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 cursor-pointer">&times;</span>
+    <h2 id="modal-title" class="text-xl font-bold mb-6 text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-map-pin text-cyan-400"></i> Add Map Report</h2>
 
     <form id="place-form" class="space-y-4">
       <input type="hidden" id="selected-lat" name="lat">
       <input type="hidden" id="selected-lng" name="lng">
 
-      <div class="bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl flex items-center justify-center gap-2 text-sm text-blue-200 mb-4">
+      <div class="bg-blue-200/10 border border-blue-500/30 p-3 rounded-xl flex items-center justify-center gap-2 text-sm text-blue-200 mb-4">
         <i class="fas fa-crosshairs text-blue-400 animate-pulse"></i>
         <span id="location-status">Click on map to select location</span>
       </div>
 
       <div class="form-group">
-        <label for="place-name" class="block text-sm text-slate-300 mb-1">Place Name</label>
-        <input type="text" id="place-name" class="input-field w-full p-3 rounded-xl text-white" placeholder="E.g., Colombo Fort Station" required>
+        <label for="place-name" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Place Name</label>
+        <input type="text" id="place-name" class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100" placeholder="E.g., Colombo Fort Station" required>
       </div>
       
       <div class="form-group">
-        <label for="place-type" class="block text-sm text-slate-300 mb-1">Type</label>
-        <select id="place-type" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
-          <option value="flood" class="bg-slate-800">Flood Area</option>
-          <option value="landslide" class="bg-slate-800">Landslide Risk</option>
-          <option value="road-block" class="bg-slate-800">Blocked Road</option>
-          <option value="safe-zone" class="bg-slate-800">Safe Zone</option>
-          <option value="rescue-needed" class="bg-slate-800">Rescue Needed</option>
+        <label for="place-type" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Type</label>
+        <select id="place-type" class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100 appearance-none" required>
+          <option value="flood" class="bg-slate-100">Flood Area</option>
+          <option value="landslide" class="bg-slate-100">Landslide Risk</option>
+          <option value="road-block" class="bg-slate-100">Blocked Road</option>
+          <option value="safe-zone" class="bg-slate-100">Safe Zone</option>
+          <option value="rescue-needed" class="bg-slate-100">Rescue Needed</option>
         </select>
       </div>
       
       <div class="form-group">
-        <label for="place-description" class="block text-sm text-slate-300 mb-1">Description</label>
-        <textarea id="place-description" rows="3" class="input-field w-full p-3 rounded-xl text-white" placeholder="Describe the situation..." required></textarea>
+        <label for="place-description" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Description</label>
+        <textarea id="place-description" rows="3" class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100" placeholder="Describe the situation..." required></textarea>
       </div>
       
       <div class="form-group">
-        <label for="place-severity" class="block text-sm text-slate-300 mb-1">Severity Level</label>
-        <select id="place-severity" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
-          <option value="low" class="bg-slate-800">Low</option>
-          <option value="medium" class="bg-slate-800">Medium</option>
-          <option value="high" class="bg-slate-800">High</option>
-          <option value="critical" class="bg-slate-800">Critical</option>
+        <label for="place-severity" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Severity Level</label>
+        <select id="place-severity" class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100 appearance-none" required>
+          <option value="low" class="bg-slate-100">Low</option>
+          <option value="medium" class="bg-slate-100">Medium</option>
+          <option value="high" class="bg-slate-100">High</option>
+          <option value="critical" class="bg-slate-100">Critical</option>
         </select>
       </div>
       
-      <button type="submit" class="w-full py-3 mt-4 rounded-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 transition-colors text-white shadow-lg">Submit Location</button>
+      <button type="submit" class="w-full py-3 mt-4 rounded-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 transition-colors text-slate-900 dark:text-slate-100 shadow-lg">Submit Location</button>
     </form>
   </div>
 </div>
 
-<nav class="fixed bottom-0 w-full glass-panel border-t border-white/10 flex z-50">
+<nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex z-50">
     <button class="nav-btn active py-4" data-tab="map">
       <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>

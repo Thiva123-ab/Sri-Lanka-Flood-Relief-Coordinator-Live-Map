@@ -168,14 +168,14 @@ class MapController {
         return L.divIcon({
             className: 'custom-marker-container',
             html: `
-                <div class="marker-pin" style="background-color: ${color}; opacity: ${opacity}; transform: rotate(-45deg);">
-                    <i class="fas ${icon}" style="transform: rotate(45deg); color: white; font-size: 14px;"></i>
+                <div class="marker-circle" style="background-color: ${color}; opacity: ${opacity}; width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 3px solid rgba(255,255,255,0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.4);">
+                    <i class="fas ${icon}" style="color: white; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
                 </div>
                 ${isPulse ? `<div class="marker-pulse" style="border-color: ${color};"></div>` : ''}
             `,
-            iconSize: [30, 42],
-            iconAnchor: [15, 42], // Correct anchor: Horizontal Center (15), Bottom (42)
-            popupAnchor: [0, -35]
+            iconSize: [36, 36],
+            iconAnchor: [18, 18], // Center of the circle
+            popupAnchor: [0, -20]
         });
     }
 

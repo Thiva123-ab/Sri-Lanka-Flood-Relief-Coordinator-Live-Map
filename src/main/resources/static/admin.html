@@ -1,197 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Flood Relief Sri Lanka</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
-  </script>
-  <style>
-      body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-      .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
-      .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
-      .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
-      .nav-btn i { font-size: 1.25rem; margin-bottom: 0.25rem; }
-      .nav-btn span { font-size: 0.75rem; font-weight: 500; }
-      
-      /* Modal fixes */
-      .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
-      .modal[style*="display: block"] { display: flex !important; }
-      .input-field { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
-      .input-field:focus { border-color: #3b82f6; outline: none; }
-  </style>
-</head>
-<body class="relative min-h-screen bg-slate-900 pb-20">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Flood Relief Sri Lanka</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
 
-<header class="fixed w-full top-0 z-50 glass-panel border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="logo flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center">
-                <i class="fas fa-water text-white text-sm"></i>
+        .bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 20%;
+            color: #94a3b8;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            color: #38bdf8;
+        }
+
+        .nav-btn i {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-btn span {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Modal fixes */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal[style*="display: block"] {
+            display: flex !important;
+        }
+
+        .input-field {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+    </style>
+<script src="js/theme.js"></script></head>
+
+<body class="relative min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-teal-100 dark:from-indigo-950 dark:via-slate-900 dark:to-indigo-950 pb-20">
+
+    <header class="fixed w-full top-0 z-50 bg-white/40 dark:bg-indigo-950/70 dark:backdrop-blur-xl backdrop-blur-md border-b border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="logo flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center">
+                    <i class="fas fa-water text-slate-900 dark:text-slate-100 text-sm"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 hidden sm:block">Flood Relief <span
+                        class="text-cyan-400">SL</span></h1>
             </div>
-            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Flood Relief <span class="text-cyan-400">SL</span></h1>
-        </div>
-        <div class="user-info flex items-center gap-4">
-            <span id="user-role" class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/50 text-xs font-semibold text-indigo-300 uppercase tracking-wider">Admin</span>
-            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-white/10 hover:bg-red-500/80 transition-colors">Logout</button>
-        </div>
-    </div>
-</header>
-
-<main class="pt-24 px-4 max-w-7xl mx-auto main-container">
-  <div class="admin-dashboard animate__animated animate__fadeIn">
-    
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-white mb-2">Administrator Dashboard</h1>
-            <p class="text-slate-400">Manage alerts, approve reports, and coordinate rescue efforts.</p>
-        </div>
-        <a href="analysis.html" class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-semibold shadow-lg hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 flex items-center gap-2">
-            <i class="fas fa-chart-pie"></i> View Analytics
-        </a>
-    </div>
-
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 dashboard-stats">
-      <div class="glass-panel p-6 rounded-2xl border-t-4 border-amber-500 text-center hover:bg-white/5 transition-colors">
-        <i class="fas fa-exclamation-triangle text-2xl text-amber-500 mb-3 block"></i>
-        <p class="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Pending</p>
-        <h3 id="pending-count" class="text-3xl font-bold text-white">0</h3>
-      </div>
-      <div class="glass-panel p-6 rounded-2xl border-t-4 border-emerald-500 text-center hover:bg-white/5 transition-colors">
-        <i class="fas fa-check-circle text-2xl text-emerald-500 mb-3 block"></i>
-        <p class="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Approved</p>
-        <h3 id="approved-count" class="text-3xl font-bold text-white">0</h3>
-      </div>
-      <div class="glass-panel p-6 rounded-2xl border-t-4 border-rose-500 text-center hover:bg-white/5 transition-colors">
-        <i class="fas fa-times-circle text-2xl text-rose-500 mb-3 block"></i>
-        <p class="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Rejected</p>
-        <h3 id="rejected-count" class="text-3xl font-bold text-white">0</h3>
-      </div>
-      <div class="glass-panel p-6 rounded-2xl border-t-4 border-blue-500 text-center hover:bg-white/5 transition-colors">
-        <i class="fas fa-bell text-2xl text-blue-500 mb-3 block"></i>
-        <p class="text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Active Alerts</p>
-        <h3 id="alerts-count" class="text-3xl font-bold text-white">0</h3>
-      </div>
-    </div>
-
-    <!-- Main Sections -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 admin-sections">
-
-      <!-- Help Requests -->
-      <div class="section glass-panel p-6 rounded-2xl">
-        <div class="flex items-center gap-3 border-b border-white/10 pb-4 mb-6">
-            <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500"><i class="fas fa-hands-helping"></i></div>
-            <h2 class="text-xl font-bold">Emergency Help Requests</h2>
-        </div>
-        <div id="help-requests-list" class="reports-list space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-          <p class="text-center text-slate-500 py-8">Loading requests...</p>
-        </div>
-      </div>
-
-      <!-- Pending Reports -->
-      <div class="section glass-panel p-6 rounded-2xl">
-        <div class="flex items-center gap-3 border-b border-white/10 pb-4 mb-6">
-            <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-500"><i class="fas fa-map-marker-alt"></i></div>
-            <h2 class="text-xl font-bold">Pending Location Reports</h2>
-        </div>
-        <div id="pending-reports" class="reports-list space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-        </div>
-      </div>
-
-      <!-- Alerts Management -->
-      <div class="section glass-panel p-6 rounded-2xl lg:col-span-2">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-500"><i class="fas fa-broadcast-tower"></i></div>
-                <h2 class="text-xl font-bold">Manage Alerts</h2>
+            <div class="user-info flex items-center gap-4">
+                <span id="user-role"
+                    class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/50 text-xs font-semibold text-indigo-300 uppercase tracking-wider">Admin</span>
+                <button id="theme-toggle" class="p-2 mr-3 rounded-full bg-slate-200 dark:bg-indigo-900/50 text-slate-800 dark:text-yellow-400 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors shadow-inner flex items-center justify-center w-10 h-10 border border-slate-300 dark:border-indigo-400/30"><i class="fas fa-moon"></i></button>
+            <button id="logout-btn"
+                    class="px-4 py-1.5 rounded-lg text-sm font-medium text-slate-900 dark:text-slate-100 bg-slate-200/50 hover:bg-red-500/80 transition-colors">Logout</button>
             </div>
-            <button id="add-alert-btn" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-semibold transition-colors flex items-center gap-2">
-                <i class="fas fa-plus"></i> Create Alert
-            </button>
         </div>
-        <div id="alerts-list" class="alerts-list grid grid-cols-1 md:grid-cols-2 gap-4">
+    </header>
+
+    <main class="pt-24 px-4 max-w-7xl mx-auto main-container">
+        <div class="admin-dashboard animate__animated animate__fadeIn">
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Administrator Dashboard</h1>
+                    <p class="text-slate-600 dark:text-slate-400">Manage alerts, approve reports, and coordinate rescue efforts.</p>
+                </div>
+                <a href="analysis.html"
+                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 font-semibold shadow-lg hover:shadow-indigo-500/30 transition-all hover:-translate-y-1 flex items-center gap-2">
+                    <i class="fas fa-chart-pie"></i> View Analytics
+                </a>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 dashboard-stats">
+                <div
+                    class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl border-t-4 border-amber-500 text-center hover:bg-slate-100/50 transition-colors">
+                    <i class="fas fa-exclamation-triangle text-xl text-amber-500 mb-3 block"></i>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Pending</p>
+                    <h3 id="pending-count" class="text-xl font-bold text-slate-900 dark:text-slate-100">0</h3>
+                </div>
+                <div
+                    class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl border-t-4 border-emerald-500 text-center hover:bg-slate-100/50 transition-colors">
+                    <i class="fas fa-check-circle text-xl text-emerald-500 mb-3 block"></i>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Approved</p>
+                    <h3 id="approved-count" class="text-xl font-bold text-slate-900 dark:text-slate-100">0</h3>
+                </div>
+                <div
+                    class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl border-t-4 border-rose-500 text-center hover:bg-slate-100/50 transition-colors">
+                    <i class="fas fa-times-circle text-xl text-rose-500 mb-3 block"></i>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Rejected</p>
+                    <h3 id="rejected-count" class="text-xl font-bold text-slate-900 dark:text-slate-100">0</h3>
+                </div>
+                <div
+                    class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl border-t-4 border-blue-500 text-center hover:bg-slate-100/50 transition-colors">
+                    <i class="fas fa-bell text-xl text-blue-500 mb-3 block"></i>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide mb-1">Active Alerts</p>
+                    <h3 id="alerts-count" class="text-xl font-bold text-slate-900 dark:text-slate-100">0</h3>
+                </div>
+            </div>
+
+            <!-- Main Sections -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 admin-sections">
+
+                <!-- Help Requests -->
+                <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl">
+                    <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500"><i
+                                class="fas fa-hands-helping"></i></div>
+                        <h2 class="text-xl font-bold">Emergency Help Requests</h2>
+                    </div>
+                    <div id="help-requests-list"
+                        class="reports-list space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <p class="text-center text-slate-600 dark:text-slate-400 py-8">Loading requests...</p>
+                    </div>
+                </div>
+
+                <!-- Pending Reports -->
+                <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl">
+                    <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-500">
+                            <i class="fas fa-map-marker-alt"></i></div>
+                        <h2 class="text-xl font-bold">Pending Location Reports</h2>
+                    </div>
+                    <div id="pending-reports"
+                        class="reports-list space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    </div>
+                </div>
+
+                <!-- Alerts Management -->
+                <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl lg:col-span-2">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-blue-200/20 flex items-center justify-center text-blue-500">
+                                <i class="fas fa-broadcast-tower"></i></div>
+                            <h2 class="text-xl font-bold">Manage Alerts</h2>
+                        </div>
+                        <button id="add-alert-btn"
+                            class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-200 text-sm font-semibold transition-colors flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Create Alert
+                        </button>
+                    </div>
+                    <div id="alerts-list" class="alerts-list grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+                </div>
+
+                <!-- Rejected Reports -->
+                <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-2xl lg:col-span-2 border-t-2 border-rose-500/50">
+                    <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-500">
+                            <i class="fas fa-trash-alt"></i></div>
+                        <h2 class="text-xl font-bold text-rose-400">Rejected Reports Archive</h2>
+                    </div>
+                    <div id="rejected-reports"
+                        class="reports-list grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <p class="text-center text-slate-600 dark:text-slate-400 py-8 col-span-full">No rejected reports.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Alert Creation Modal -->
+            <div id="alert-modal" class="modal">
+                <div
+                    class="modal-content bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-blue-500">
+                    <span
+                        class="close absolute top-5 right-6 text-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 cursor-pointer">&times;</span>
+                    <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-slate-100 flex items-center gap-2"><i
+                            class="fas fa-bell text-blue-500"></i> Create New Alert</h2>
+
+                    <form id="alert-form" class="space-y-4">
+                        <div class="form-group">
+                            <label for="alert-title-en" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Title</label>
+                            <input type="text" id="alert-title-en" class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100"
+                                placeholder="Enter alert title" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alert-description-en"
+                                class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Description</label>
+                            <textarea id="alert-description-en" rows="3"
+                                class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100"
+                                placeholder="Enter alert details..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alert-level" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Alert Level</label>
+                            <select id="alert-level"
+                                class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100 appearance-none" required>
+                                <option value="low" class="bg-slate-100">Low (Info)</option>
+                                <option value="medium" class="bg-slate-100">Medium (Warning)</option>
+                                <option value="high" class="bg-slate-100">High (Danger)</option>
+                                <option value="critical" class="bg-slate-100">Critical (Emergency)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alert-location" class="block text-sm text-slate-600 dark:text-slate-400 mb-1">Location</label>
+                            <input type="text" id="alert-location" class="input-field w-full p-3 rounded-xl text-slate-900 dark:text-slate-100"
+                                placeholder="Affected area (e.g., Western Province)" required>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-3 mt-2 rounded-xl font-bold bg-blue-600 hover:bg-blue-200 transition-colors text-slate-900 dark:text-slate-100">Broadcast
+                            Alert</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
+    </main>
 
-      <!-- Rejected Reports -->
-      <div class="section glass-panel p-6 rounded-2xl lg:col-span-2 border-t-2 border-rose-500/50">
-        <div class="flex items-center gap-3 border-b border-white/10 pb-4 mb-6">
-            <div class="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center text-rose-500"><i class="fas fa-trash-alt"></i></div>
-            <h2 class="text-xl font-bold text-rose-400">Rejected Reports Archive</h2>
-        </div>
-        <div id="rejected-reports" class="reports-list grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-          <p class="text-center text-slate-500 py-8 col-span-full">No rejected reports.</p>
-        </div>
-      </div>
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
+        <button class="nav-btn py-3" data-tab="map">
+            <i class="fas fa-map-marked-alt"></i><span>Map</span>
+        </button>
+        <button class="nav-btn py-3" data-tab="reports">
+            <i class="fas fa-exclamation-triangle"></i><span>Reports</span>
+        </button>
+        <button class="nav-btn py-3" data-tab="alerts">
+            <i class="fas fa-bell"></i><span>Alerts</span>
+        </button>
+        <button class="nav-btn py-3" onclick="location.href='chat.html'">
+            <i class="fas fa-comments"></i><span>Chat</span>
+        </button>
+        <button class="nav-btn active py-3" data-tab="profile">
+            <i class="fas fa-user-shield"></i><span>Admin</span>
+        </button>
+    </nav>
 
-    </div>
-
-    <!-- Alert Creation Modal -->
-    <div id="alert-modal" class="modal">
-      <div class="modal-content glass-panel rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-blue-500">
-        <span class="close absolute top-5 right-6 text-2xl text-slate-400 hover:text-white cursor-pointer">&times;</span>
-        <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-bell text-blue-500"></i> Create New Alert</h2>
-        
-        <form id="alert-form" class="space-y-4">
-          <div class="form-group">
-            <label for="alert-title-en" class="block text-sm text-slate-300 mb-1">Title</label>
-            <input type="text" id="alert-title-en" class="input-field w-full p-3 rounded-xl text-white" placeholder="Enter alert title" required>
-          </div>
-
-          <div class="form-group">
-            <label for="alert-description-en" class="block text-sm text-slate-300 mb-1">Description</label>
-            <textarea id="alert-description-en" rows="3" class="input-field w-full p-3 rounded-xl text-white" placeholder="Enter alert details..." required></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="alert-level" class="block text-sm text-slate-300 mb-1">Alert Level</label>
-            <select id="alert-level" class="input-field w-full p-3 rounded-xl text-white appearance-none" required>
-              <option value="low" class="bg-slate-800">Low (Info)</option>
-              <option value="medium" class="bg-slate-800">Medium (Warning)</option>
-              <option value="high" class="bg-slate-800">High (Danger)</option>
-              <option value="critical" class="bg-slate-800">Critical (Emergency)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="alert-location" class="block text-sm text-slate-300 mb-1">Location</label>
-            <input type="text" id="alert-location" class="input-field w-full p-3 rounded-xl text-white" placeholder="Affected area (e.g., Western Province)" required>
-          </div>
-
-          <button type="submit" class="w-full py-3 mt-2 rounded-xl font-bold bg-blue-600 hover:bg-blue-500 transition-colors text-white">Broadcast Alert</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</main>
-
-<!-- Bottom Navigation for Mobile -->
-<nav class="fixed bottom-0 w-full glass-panel border-t border-white/10 flex sm:hidden z-50">
-    <button class="nav-btn py-3" data-tab="map">
-      <i class="fas fa-map-marked-alt"></i><span>Map</span>
-    </button>
-    <button class="nav-btn py-3" data-tab="reports">
-      <i class="fas fa-exclamation-triangle"></i><span>Reports</span>
-    </button>
-    <button class="nav-btn py-3" data-tab="alerts">
-      <i class="fas fa-bell"></i><span>Alerts</span>
-    </button>
-    <button class="nav-btn py-3" onclick="location.href='chat.html'">
-      <i class="fas fa-comments"></i><span>Chat</span>
-    </button>
-    <button class="nav-btn active py-3" data-tab="profile">
-      <i class="fas fa-user-shield"></i><span>Admin</span>
-    </button>
-</nav>
-
-<script src="js/auth.js"></script>
-<script src="js/admin.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
 </body>
+
 </html>

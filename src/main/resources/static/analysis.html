@@ -13,26 +13,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-      tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
+      tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 500: '#3b82f6' } } } } }
     </script>
     <style>
-        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(0,0,0,0.05); }
     </style>
-</head>
-<body class="relative min-h-screen bg-slate-900 pb-20">
+<script src="js/theme.js"></script></head>
+<body class="relative min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-teal-100 dark:from-indigo-950 dark:via-slate-900 dark:to-indigo-950 pb-20">
 
-<header class="fixed w-full top-0 z-50 glass-panel border-b border-white/10">
+<header class="fixed w-full top-0 z-50 bg-white/40 dark:bg-indigo-950/70 dark:backdrop-blur-xl backdrop-blur-md border-b border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="logo flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center">
-                <i class="fas fa-water text-white text-sm"></i>
+                <i class="fas fa-water text-slate-900 dark:text-slate-100 text-sm"></i>
             </div>
-            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Flood Relief <span class="text-cyan-400">SL</span></h1>
+            <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 hidden sm:block">Flood Relief <span class="text-cyan-400">SL</span></h1>
         </div>
         <div class="user-info flex items-center gap-4">
             <span id="user-role" class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/50 text-xs font-semibold text-indigo-300 uppercase tracking-wider">Admin</span>
-            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-white/10 hover:bg-red-500/80 transition-colors">Logout</button>
+            <button id="theme-toggle" class="p-2 mr-3 rounded-full bg-slate-200 dark:bg-indigo-900/50 text-slate-800 dark:text-yellow-400 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors shadow-inner flex items-center justify-center w-10 h-10 border border-slate-300 dark:border-indigo-400/30"><i class="fas fa-moon"></i></button>
+            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-slate-900 dark:text-slate-100 bg-slate-200/50 hover:bg-red-500/80 transition-colors">Logout</button>
         </div>
     </div>
 </header>
@@ -40,67 +41,67 @@
 <main class="pt-24 px-4 max-w-7xl mx-auto main-container">
     <div class="admin-dashboard animate__animated animate__fadeIn">
         <div class="flex items-center gap-4 mb-8">
-            <a href="admin.html" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-white/10 transition-colors text-slate-300 hover:text-white">
+            <a href="admin.html" class="w-10 h-10 rounded-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 flex items-center justify-center hover:bg-slate-200/50 transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-white">Situation Analytics</h1>
-                <p class="text-slate-400 text-sm">Real-time data visualization and PDF reporting</p>
+                <h1 class="text-xl font-bold text-slate-900 dark:text-slate-100">Situation Analytics</h1>
+                <p class="text-slate-600 dark:text-slate-400 text-sm">Real-time data visualization and PDF reporting</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 dashboard-stats">
-            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group">
-                <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
+            <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl relative overflow-hidden group">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-200/10 rounded-full blur-xl group-hover:bg-blue-200/20 transition-all"></div>
                 <div class="flex items-center gap-4 mb-4 relative z-10">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl"><i class="fas fa-map-marker-alt"></i></div>
-                    <h3 class="text-slate-300 font-medium">Total Incidents</h3>
+                    <div class="w-10 h-10 rounded-xl bg-blue-200/20 text-blue-400 flex items-center justify-center text-xl"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 class="text-slate-600 dark:text-slate-400 font-medium">Total Incidents</h3>
                 </div>
-                <p id="total-incidents" class="text-4xl font-black text-white relative z-10">0</p>
+                <p id="total-incidents" class="text-xl font-black text-slate-900 dark:text-slate-100 relative z-10">0</p>
             </div>
             
-            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group">
+            <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl relative overflow-hidden group">
                 <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all"></div>
                 <div class="flex items-center gap-4 mb-4 relative z-10">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl"><i class="fas fa-hands-helping"></i></div>
-                    <h3 class="text-slate-300 font-medium">Help Requests</h3>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl"><i class="fas fa-hands-helping"></i></div>
+                    <h3 class="text-slate-600 dark:text-slate-400 font-medium">Help Requests</h3>
                 </div>
-                <p id="total-requests" class="text-4xl font-black text-white relative z-10">0</p>
+                <p id="total-requests" class="text-xl font-black text-slate-900 dark:text-slate-100 relative z-10">0</p>
             </div>
 
-            <div class="glass-panel p-6 rounded-3xl relative overflow-hidden group border-b-4 border-rose-500">
+            <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl relative overflow-hidden group border-b-4 border-rose-500">
                 <div class="absolute -right-6 -top-6 w-24 h-24 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
                 <div class="flex items-center gap-4 mb-4 relative z-10">
-                    <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl"><i class="fas fa-exclamation-circle"></i></div>
-                    <h3 class="text-slate-300 font-medium">High Risk Areas</h3>
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl"><i class="fas fa-exclamation-circle"></i></div>
+                    <h3 class="text-slate-600 dark:text-slate-400 font-medium">High Risk Areas</h3>
                 </div>
-                <p id="high-risk-count" class="text-4xl font-black text-white relative z-10">0</p>
+                <p id="high-risk-count" class="text-xl font-black text-slate-900 dark:text-slate-100 relative z-10">0</p>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 admin-sections">
-            <div class="section glass-panel p-6 rounded-3xl">
-                <h2 class="text-xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chart-bar text-blue-500"></i> Incident Types</h2>
+            <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl">
+                <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-chart-bar text-blue-500"></i> Incident Types</h2>
                 <div class="relative h-64 w-full">
                     <canvas id="incidentChart"></canvas>
                 </div>
             </div>
             
-            <div class="section glass-panel p-6 rounded-3xl">
-                <h2 class="text-xl font-bold mb-6 text-white flex items-center gap-2"><i class="fas fa-chart-pie text-purple-500"></i> Help Needs Analysis</h2>
+            <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl">
+                <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-chart-pie text-purple-500"></i> Help Needs Analysis</h2>
                 <div class="relative h-64 w-full flex justify-center">
                     <canvas id="needsChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="glass-panel p-8 rounded-3xl text-center relative overflow-hidden border border-blue-500/30">
+        <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-8 rounded-3xl text-center relative overflow-hidden border border-blue-500/30">
             <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-500/10"></div>
             <div class="relative z-10 max-w-2xl mx-auto">
-                <div class="w-16 h-16 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce"><i class="fas fa-file-pdf"></i></div>
-                <h2 class="text-2xl font-bold text-white mb-3">Download Official Reports</h2>
-                <p class="text-slate-400 mb-8 leading-relaxed">Generate a comprehensive, printable PDF report containing all verified incidents, active help requests, and real-time community statistics.</p>
-                <button id="download-pdf-btn" class="px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-600 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all text-lg flex items-center gap-3 mx-auto">
+                <div class="w-10 h-10 rounded-full bg-blue-200/20 text-blue-400 flex items-center justify-center text-xl mx-auto mb-4 animate-bounce"><i class="fas fa-file-pdf"></i></div>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Download Official Reports</h2>
+                <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">Generate a comprehensive, printable PDF report containing all verified incidents, active help requests, and real-time community statistics.</p>
+                <button id="download-pdf-btn" class="px-8 py-4 rounded-xl font-bold text-slate-900 dark:text-slate-100 bg-gradient-to-r from-blue-600 to-cyan-600 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all text-lg flex items-center gap-3 mx-auto">
                     <i class="fas fa-download"></i> Generate PDF Report
                 </button>
             </div>

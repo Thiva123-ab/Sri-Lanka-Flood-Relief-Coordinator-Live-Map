@@ -11,28 +11,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-      tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+      tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
     </script>
     <style>
-        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); }
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(0,0,0,0.05); }
         .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
         .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
     </style>
-</head>
-<body class="relative min-h-screen bg-slate-900 pb-20">
+<script src="js/theme.js"></script></head>
+<body class="relative min-h-screen bg-gradient-to-br from-emerald-50 via-sky-50 to-teal-100 dark:from-indigo-950 dark:via-slate-900 dark:to-indigo-950 pb-20">
 
-<header class="fixed w-full top-0 z-50 glass-panel border-b border-white/10">
+<header class="fixed w-full top-0 z-50 bg-white/40 dark:bg-indigo-950/70 dark:backdrop-blur-xl backdrop-blur-md border-b border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="logo flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center">
-                <i class="fas fa-water text-white text-sm"></i>
+                <i class="fas fa-water text-slate-900 dark:text-slate-100 text-sm"></i>
             </div>
-            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Emergency Alerts</h1>
+            <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 hidden sm:block">Emergency Alerts</h1>
         </div>
         <div class="user-info flex items-center gap-4">
-            <span id="user-role" class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold tracking-wider backdrop-blur-md">Member</span>
-            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors">Logout</button>
+            <span id="user-role" class="px-3 py-1 rounded-full bg-slate-200/50 border border-slate-300 text-xs font-semibold tracking-wider backdrop-blur-md">Member</span>
+            <button id="theme-toggle" class="p-2 mr-3 rounded-full bg-slate-200 dark:bg-indigo-900/50 text-slate-800 dark:text-yellow-400 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors shadow-inner flex items-center justify-center w-10 h-10 border border-slate-300 dark:border-indigo-400/30"><i class="fas fa-moon"></i></button>
+            <button id="logout-btn" class="px-4 py-1.5 rounded-lg text-sm font-medium text-slate-900 dark:text-slate-100 bg-red-500 hover:bg-red-600 transition-colors">Logout</button>
         </div>
     </div>
 </header>
@@ -40,52 +41,52 @@
 <main class="pt-24 px-4 max-w-4xl mx-auto w-full">
     <div class="animate__animated animate__fadeIn">
 
-        <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
-            <div class="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-500 flex items-center justify-center text-2xl">
+        <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+            <div class="w-14 h-14 rounded-2xl bg-blue-200/20 text-blue-500 flex items-center justify-center text-xl">
                 <i class="fas fa-broadcast-tower"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-bold text-white">Government Alerts</h1>
-                <p class="text-slate-400">Official emergency broadcasts from disaster management centers.</p>
+                <h1 class="text-xl font-bold text-slate-900 dark:text-slate-100">Government Alerts</h1>
+                <p class="text-slate-600 dark:text-slate-400">Official emergency broadcasts from disaster management centers.</p>
             </div>
         </div>
 
         <div class="alert-list space-y-6">
             
-            <div class="glass-panel p-6 rounded-3xl border-l-4 border-rose-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+            <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl border-l-4 border-rose-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
                 <div class="absolute right-0 top-0 w-32 h-32 bg-rose-500/10 rounded-bl-full pointer-events-none group-hover:bg-rose-500/20 transition-colors"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-exclamation-triangle text-rose-500"></i> Flash Flood Warning</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-rose-500"></i> Flash Flood Warning</h3>
                     <span class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-wider">High</span>
                 </div>
-                <p class="text-slate-300 mb-6 leading-relaxed">Heavy rainfall expected in Western Province. Residents in low-lying areas should evacuate immediately. Rivers are reaching critical levels.</p>
-                <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                <p class="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">Heavy rainfall expected in Western Province. Residents in low-lying areas should evacuate immediately. Rivers are reaching critical levels.</p>
+                <div class="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
                     <span class="flex items-center gap-2"><i class="far fa-clock"></i> Issued: Today 10:30 AM</span>
                     <span class="flex items-center gap-2 text-rose-400/80"><i class="fas fa-map-marker-alt"></i> Western Province</span>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 rounded-3xl border-l-4 border-amber-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+            <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl border-l-4 border-amber-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
                 <div class="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-bl-full pointer-events-none group-hover:bg-amber-500/20 transition-colors"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-mountain text-amber-500"></i> Landslide Advisory</h3>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-mountain text-amber-500"></i> Landslide Advisory</h3>
                     <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">Medium</span>
                 </div>
-                <p class="text-slate-300 mb-6 leading-relaxed">Saturated soil conditions in Hill Country regions. Caution advised for travel on mountain roads. Avoid slopes if heavy rain begins.</p>
-                <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                <p class="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">Saturated soil conditions in Hill Country regions. Caution advised for travel on mountain roads. Avoid slopes if heavy rain begins.</p>
+                <div class="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
                     <span class="flex items-center gap-2"><i class="far fa-clock"></i> Issued: Yesterday 3:45 PM</span>
                     <span class="flex items-center gap-2 text-amber-400/80"><i class="fas fa-map-marker-alt"></i> Central Province</span>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 rounded-3xl border-l-4 border-blue-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
-                <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500/10 rounded-bl-full pointer-events-none group-hover:bg-blue-500/20 transition-colors"></div>
+            <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl border-l-4 border-blue-500 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                <div class="absolute right-0 top-0 w-32 h-32 bg-blue-200/10 rounded-bl-full pointer-events-none group-hover:bg-blue-200/20 transition-colors"></div>
                 <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fas fa-water text-blue-500"></i> River Level Monitoring</h3>
-                    <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">Low</span>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-water text-blue-500"></i> River Level Monitoring</h3>
+                    <span class="px-3 py-1 rounded-full bg-blue-200/20 text-blue-400 text-xs font-bold uppercase tracking-wider">Low</span>
                 </div>
-                <p class="text-slate-300 mb-6 leading-relaxed">Kelani River levels rising but currently within safe limits. Continuing to monitor updates. Minor flooding possible in adjacent unpaved areas.</p>
-                <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                <p class="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">Kelani River levels rising but currently within safe limits. Continuing to monitor updates. Minor flooding possible in adjacent unpaved areas.</p>
+                <div class="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
                     <span class="flex items-center gap-2"><i class="far fa-clock"></i> Issued: Jun 14 8:15 AM</span>
                     <span class="flex items-center gap-2 text-blue-400/80"><i class="fas fa-map-marker-alt"></i> Colombo District</span>
                 </div>
@@ -95,7 +96,7 @@
     </div>
 </main>
 
-<nav class="fixed bottom-0 w-full glass-panel border-t border-white/10 flex sm:hidden z-50">
+<nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
     <button class="nav-btn py-4" onclick="location.href='map.html'">
       <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>
