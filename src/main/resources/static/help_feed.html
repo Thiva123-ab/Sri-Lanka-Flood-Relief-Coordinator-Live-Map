@@ -16,7 +16,7 @@
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(0,0,0,0.05); }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #64748b; transition: all 0.3s; } html.dark .nav-btn { color: #cbd5e1; }
         .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
     </style>
 <script src="js/theme.js"></script></head>
@@ -42,7 +42,7 @@
     <div class="admin-dashboard animate__animated animate__fadeIn">
         
         <div class="flex items-center gap-4 mb-8">
-            <a href="help.html" class="w-10 h-10 rounded-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 flex items-center justify-center hover:bg-slate-200/50 transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100">
+            <a href="help.html" class="w-10 h-10 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 flex items-center justify-center hover:bg-slate-200/50 transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <div>
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="section bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl border-t-4 border-blue-500">
+        <div class="section bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl border-t-4 border-blue-500">
             <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
                 <h2 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-list-ul text-blue-400"></i> Active Requests</h2>
                 <div class="flex items-center gap-2 text-sm text-emerald-400">
@@ -73,7 +73,7 @@
     </div>
 </main>
 
-<nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
+<nav class="fixed bottom-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
     <button class="nav-btn py-4" data-tab="map">
       <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>

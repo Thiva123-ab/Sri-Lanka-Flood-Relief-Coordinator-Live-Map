@@ -30,7 +30,7 @@
       .input-field { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: #1e293b; transition: all 0.3s; }
       .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); outline: none; }
       
-      .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
+      .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #64748b; transition: all 0.3s; } html.dark .nav-btn { color: #cbd5e1; }
       .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
   </style>
 <script src="js/theme.js"></script></head>
@@ -62,7 +62,7 @@
 </button>
 
 <div id="place-modal" class="modal">
-  <div class="modal-content bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-cyan-500">
+  <div class="modal-content bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl p-8 w-full max-w-lg relative animate__animated animate__zoomIn animate__faster border-t-4 border-cyan-500">
     <span class="close absolute top-5 right-6 text-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 cursor-pointer">&times;</span>
     <h2 id="modal-title" class="text-xl font-bold mb-6 text-slate-900 dark:text-slate-100 flex items-center gap-2"><i class="fas fa-map-pin text-cyan-400"></i> Add Map Report</h2>
 
@@ -111,7 +111,7 @@
   </div>
 </div>
 
-<nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex z-50">
+<nav class="fixed bottom-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex z-50">
     <button class="nav-btn active py-4" data-tab="map">
       <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>

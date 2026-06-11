@@ -19,7 +19,7 @@
         .input-field { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: #1e293b; transition: all 0.3s; }
         .input-field:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); outline: none; }
         
-        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #64748b; transition: all 0.3s; } html.dark .nav-btn { color: #cbd5e1; }
         .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
     </style>
 <script src="js/theme.js"></script></head>
@@ -53,7 +53,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Help Form -->
-            <div class="md:col-span-2 bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl p-8 border-t-4 border-red-500 relative overflow-hidden">
+            <div class="md:col-span-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 rounded-3xl p-8 border-t-4 border-red-500 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-slate-100 flex items-center gap-3">
@@ -108,7 +108,7 @@
             <div class="md:col-span-1 space-y-6">
                 <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4 border-b border-slate-200 pb-2">Hotlines</h3>
                 
-                <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl flex items-center gap-5 hover:bg-slate-100/50 transition-colors border-l-4 border-emerald-500">
+                <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl flex items-center gap-5 hover:bg-slate-100/50 transition-colors border-l-4 border-emerald-500">
                     <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl"><i class="fas fa-ambulance"></i></div>
                     <div>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide">Ambulance</p>
@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl flex items-center gap-5 hover:bg-slate-100/50 transition-colors border-l-4 border-rose-500">
+                <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl flex items-center gap-5 hover:bg-slate-100/50 transition-colors border-l-4 border-rose-500">
                     <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl"><i class="fas fa-fire-extinguisher"></i></div>
                     <div>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide">Fire & Rescue</p>
@@ -124,7 +124,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl flex items-center gap-5 hover:bg-slate-100/50 transition-colors border-l-4 border-blue-500">
+                <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 p-6 rounded-3xl flex items-center gap-5 hover:bg-slate-100/50 transition-colors border-l-4 border-blue-500">
                     <div class="w-14 h-14 rounded-full bg-blue-200/20 text-blue-400 flex items-center justify-center text-xl"><i class="fas fa-phone"></i></div>
                     <div>
                         <p class="text-slate-600 dark:text-slate-400 text-sm font-medium uppercase tracking-wide">Police</p>
@@ -136,7 +136,7 @@
     </div>
 </main>
 
-<nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
+<nav class="fixed bottom-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
     <button class="nav-btn py-4" data-tab="map">
       <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>

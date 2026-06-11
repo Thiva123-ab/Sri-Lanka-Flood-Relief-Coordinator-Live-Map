@@ -31,7 +31,7 @@
         .message-input-area button { width: 48px; height: 48px; border-radius: 50%; background: #3b82f6; color: #1e293b; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .message-input-area button:hover { background: #2563eb; transform: scale(1.05); }
 
-        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #94a3b8; transition: all 0.3s; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 20%; color: #64748b; transition: all 0.3s; } html.dark .nav-btn { color: #cbd5e1; }
         .nav-btn:hover, .nav-btn.active { color: #38bdf8; }
         
         @media (max-width: 768px) { .chat-sidebar { width: 80px; } .sidebar-header h3 { display: none; } }
@@ -96,7 +96,7 @@
     </div>
 </main>
 
-<nav class="fixed bottom-0 w-full bg-white/60 dark:bg-indigo-900/40 dark:backdrop-blur-2xl backdrop-blur-lg border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
+<nav class="fixed bottom-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-white/60 dark:border-white/10 dark:border-t-white/20 shadow-xl shadow-slate-200/50 dark:shadow-black/50 border-t border-slate-200 flex sm:hidden z-50">
     <button class="nav-btn py-3" onclick="location.href='map.html'">
       <i class="fas fa-map-marked-alt text-lg mb-1"></i><span class="text-xs">Map</span>
     </button>
